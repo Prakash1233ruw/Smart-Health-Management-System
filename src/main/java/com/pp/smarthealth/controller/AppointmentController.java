@@ -56,4 +56,11 @@ public class AppointmentController {
         appointmentService.deleteAppointment(id);
         return ResponseEntity.noContent().build();
     }
+    
+    @PostMapping("/send-reminders")
+    @Operation(summary = "Send appointment reminders", description = "Send email reminders for upcoming appointments")
+    public ResponseEntity<Void> sendAppointmentReminders() {
+        appointmentService.sendAppointmentReminders();
+        return ResponseEntity.ok().build();
+    }
 }

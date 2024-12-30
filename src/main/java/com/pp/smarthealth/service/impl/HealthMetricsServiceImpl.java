@@ -1,9 +1,13 @@
 package com.pp.smarthealth.service.impl;
 
 import com.pp.smarthealth.dto.HealthMetricsDTO;
+import com.pp.smarthealth.dto.PatientDTO;
 import com.pp.smarthealth.model.HealthMetrics;
+import com.pp.smarthealth.model.Patient;
 import com.pp.smarthealth.repository.HealthMetricsRepository;
+import com.pp.smarthealth.repository.PatientRepository;
 import com.pp.smarthealth.service.HealthMetricsService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,81 +20,91 @@ public class HealthMetricsServiceImpl implements HealthMetricsService {
     @Autowired
     private HealthMetricsRepository healthMetricsRepository;
 
-    private HealthMetricsDTO convertToDTO(HealthMetrics healthMetrics) {
-        HealthMetricsDTO healthMetricsDTO = new HealthMetricsDTO();
-        healthMetricsDTO.setId(healthMetrics.getId());
-        healthMetricsDTO.setDate(healthMetrics.getDate());
-        healthMetricsDTO.setTimestamp(healthMetrics.getTimestamp());
-        healthMetricsDTO.setSystolicPressure(healthMetrics.getSystolicPressure());
-        healthMetricsDTO.setDiastolicPressure(healthMetrics.getDiastolicPressure());
-        healthMetricsDTO.setHeartRate(healthMetrics.getHeartRate());
-        healthMetricsDTO.setTemperature(healthMetrics.getTemperature());
-        healthMetricsDTO.setRespiratoryRate(healthMetrics.getRespiratoryRate());
-        healthMetricsDTO.setBloodOxygenLevel(healthMetrics.getBloodOxygenLevel());
-        healthMetricsDTO.setBloodGlucoseLevel(healthMetrics.getBloodGlucoseLevel());
-        healthMetricsDTO.setBmi(healthMetrics.getBmi());
-        healthMetricsDTO.setTotalCholesterol(healthMetrics.getTotalCholesterol());
-        healthMetricsDTO.setHdlCholesterol(healthMetrics.getHdlCholesterol());
-        healthMetricsDTO.setLdlCholesterol(healthMetrics.getLdlCholesterol());
-        healthMetricsDTO.setTriglycerides(healthMetrics.getTriglycerides());
-        healthMetricsDTO.setWeight(healthMetrics.getWeight());
-        healthMetricsDTO.setBloodPressure(healthMetrics.getBloodPressure());
-        healthMetricsDTO.setHeight(healthMetrics.getHeight());
-        healthMetricsDTO.setWaistCircumference(healthMetrics.getWaistCircumference());
-        healthMetricsDTO.setPhysicalActivityLevel(healthMetrics.getPhysicalActivityLevel());
-        return healthMetricsDTO;
-    }
+    @Autowired
+    private PatientRepository patientRepository;
 
     @Override
-    public HealthMetricsDTO saveHealthMetrics(HealthMetrics healthMetrics) {
+    public HealthMetricsDTO saveHealthMetrics(HealthMetricsDTO healthMetricsDTO) {
+        Patient patient = patientRepository.findById(healthMetricsDTO.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+        HealthMetrics healthMetrics = convertToEntity(healthMetricsDTO, patient);
         HealthMetrics savedHealthMetrics = healthMetricsRepository.save(healthMetrics);
         return convertToDTO(savedHealthMetrics);
     }
 
     @Override
+    public List<HealthMetricsDTO> getAllHealthMetrics() {
+        return healthMetricsRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public HealthMetricsDTO getHealthMetricsById(Long id) {
-        HealthMetrics healthMetrics = findHealthMetricsById(id);
+        HealthMetrics healthMetrics = healthMetricsRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("HealthMetrics not found"));
         return convertToDTO(healthMetrics);
     }
 
-    private HealthMetrics findHealthMetricsById(Long id) {
-        return healthMetricsRepository.findById(id).orElseThrow(() -> new RuntimeException("HealthMetrics not found"));
+    @Override
+    public List<HealthMetricsDTO> getHealthMetricsByPatientId(Long patientId) {
+        Patient patient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
+        return healthMetricsRepository.findByPatient(patient)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
-    @Override
-    public List<HealthMetricsDTO> getAllHealthMetrics() {
-        return healthMetricsRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+    private HealthMetricsDTO convertToDTO(HealthMetrics healthMetrics) {
+        return new HealthMetricsDTO(
+                healthMetrics.getId(),
+                healthMetrics.getDate(),
+                healthMetrics.getTimestamp(),
+                healthMetrics.getSystolicPressure(),
+                healthMetrics.getDiastolicPressure(),
+                healthMetrics.getHeartRate(),
+                healthMetrics.getTemperature(),
+                healthMetrics.getRespiratoryRate(),
+                healthMetrics.getBloodOxygenLevel(),
+                healthMetrics.getBloodGlucoseLevel(),
+                healthMetrics.getBmi(),
+                healthMetrics.getTotalCholesterol(),
+                healthMetrics.getHdlCholesterol(),
+                healthMetrics.getLdlCholesterol(),
+                healthMetrics.getTriglycerides(),
+                healthMetrics.getWeight(),
+                healthMetrics.getHeight(),
+                healthMetrics.getWaistCircumference(),
+                healthMetrics.getPhysicalActivityLevel(),
+                healthMetrics.getPatient().getId() // Only passing patientId here
+        );
     }
 
-    @Override
-    public HealthMetricsDTO updateHealthMetrics(Long id, HealthMetrics healthMetricsDetails) {
-        HealthMetrics healthMetrics = findHealthMetricsById(id);
-        healthMetrics.setDate(healthMetricsDetails.getDate());
-        healthMetrics.setTimestamp(healthMetricsDetails.getTimestamp());
-        healthMetrics.setSystolicPressure(healthMetricsDetails.getSystolicPressure());
-        healthMetrics.setDiastolicPressure(healthMetricsDetails.getDiastolicPressure());
-        healthMetrics.setHeartRate(healthMetricsDetails.getHeartRate());
-        healthMetrics.setTemperature(healthMetricsDetails.getTemperature());
-        healthMetrics.setRespiratoryRate(healthMetricsDetails.getRespiratoryRate());
-        healthMetrics.setBloodOxygenLevel(healthMetricsDetails.getBloodOxygenLevel());
-        healthMetrics.setBloodGlucoseLevel(healthMetricsDetails.getBloodGlucoseLevel());
-        healthMetrics.setBmi(healthMetricsDetails.getBmi());
-        healthMetrics.setTotalCholesterol(healthMetricsDetails.getTotalCholesterol());
-        healthMetrics.setHdlCholesterol(healthMetricsDetails.getHdlCholesterol());
-        healthMetrics.setLdlCholesterol(healthMetricsDetails.getLdlCholesterol());
-        healthMetrics.setTriglycerides(healthMetricsDetails.getTriglycerides());
-        healthMetrics.setWeight(healthMetricsDetails.getWeight());
-        healthMetrics.setBloodPressure(healthMetricsDetails.getBloodPressure());
-        healthMetrics.setHeight(healthMetricsDetails.getHeight());
-        healthMetrics.setWaistCircumference(healthMetricsDetails.getWaistCircumference());
-        healthMetrics.setPhysicalActivityLevel(healthMetricsDetails.getPhysicalActivityLevel());
-        HealthMetrics updatedHealthMetrics = healthMetricsRepository.save(healthMetrics);
-        return convertToDTO(updatedHealthMetrics);
-    }
-
-    @Override
-    public void deleteHealthMetrics(Long id) {
-        HealthMetrics healthMetrics = findHealthMetricsById(id);
-        healthMetricsRepository.delete(healthMetrics);
+    private HealthMetrics convertToEntity(HealthMetricsDTO healthMetricsDTO, Patient patient) {
+        return new HealthMetrics(
+                healthMetricsDTO.getId(),
+                healthMetricsDTO.getDate(),
+                healthMetricsDTO.getTimestamp(),
+                healthMetricsDTO.getSystolicPressure(),
+                healthMetricsDTO.getDiastolicPressure(),
+                healthMetricsDTO.getHeartRate(),
+                healthMetricsDTO.getTemperature(),
+                healthMetricsDTO.getRespiratoryRate(),
+                healthMetricsDTO.getBloodOxygenLevel(),
+                healthMetricsDTO.getBloodGlucoseLevel(),
+                healthMetricsDTO.getBmi(),
+                healthMetricsDTO.getTotalCholesterol(),
+                healthMetricsDTO.getHdlCholesterol(),
+                healthMetricsDTO.getLdlCholesterol(),
+                healthMetricsDTO.getTriglycerides(),
+                healthMetricsDTO.getWeight(),
+                healthMetricsDTO.getHeight(),
+                healthMetricsDTO.getWaistCircumference(),
+                healthMetricsDTO.getPhysicalActivityLevel(),
+                patient // Mapping the Patient object
+        );
     }
 }

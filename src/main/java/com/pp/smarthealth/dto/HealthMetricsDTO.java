@@ -27,8 +27,9 @@ public class HealthMetricsDTO {
     private Integer ldlCholesterol;
     private Integer triglycerides;
     private Double weight;
-    private Double bloodPressure;
     private Double height;
     private Double waistCircumference;
     private Integer physicalActivityLevel;
+ 
+    private Long patientId; // Only store patientId
 }

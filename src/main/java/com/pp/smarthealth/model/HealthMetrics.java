@@ -1,6 +1,5 @@
 package com.pp.smarthealth.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "health_metrics")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,9 +19,12 @@ public class HealthMetrics {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private LocalDate date;
 
+    @Column(nullable = false)
     private LocalDateTime timestamp;
+
     private Integer systolicPressure;
     private Integer diastolicPressure;
     private Integer heartRate;
@@ -35,13 +38,11 @@ public class HealthMetrics {
     private Integer ldlCholesterol;
     private Integer triglycerides;
     private Double weight;
-    private Double bloodPressure;
     private Double height;
     private Double waistCircumference;
     private Integer physicalActivityLevel;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id")
+    @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
 }
-
