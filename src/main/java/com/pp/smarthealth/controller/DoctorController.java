@@ -11,14 +11,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pp.smarthealth.dto.DoctorDTO;
+import com.pp.smarthealth.model.Appointment;
 import com.pp.smarthealth.model.Doctor;
 import com.pp.smarthealth.service.DoctorService;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.websocket.server.PathParam;
 
 @RestController
 @RequestMapping("/api/doctors")
@@ -28,8 +30,7 @@ public class DoctorController {
     @Autowired
     private DoctorService doctorService;
     
-    @Operation(summary = "POST Operation ", description = "adding a docter")
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<DoctorDTO> createDoctor(@RequestBody Doctor doctor) {
         DoctorDTO createdDoctor = doctorService.saveDoctor(doctor);
         return ResponseEntity.ok(createdDoctor);
@@ -51,6 +52,12 @@ public class DoctorController {
     public ResponseEntity<DoctorDTO> getDoctorById(@PathVariable Long id) {
         DoctorDTO doctor = doctorService.getDoctorById(id);
         return ResponseEntity.ok(doctor);
+    }
+    
+    @GetMapping("/upcoming-appointments/{doctorId}")
+    public ResponseEntity<List<Appointment>> getUpcomingAppointments(@PathVariable Long doctorId) {
+        List<Appointment> appointments = doctorService.getUpcomingAppointments(doctorId);
+        return ResponseEntity.ok(appointments);
     }
 
     @GetMapping

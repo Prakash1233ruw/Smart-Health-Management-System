@@ -4,6 +4,7 @@ package com.pp.smarthealth.model;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,12 +28,20 @@ public class Patient {
     private Long id;
 
     private String name;
+    
+    @Column(name = "username", nullable = false)
+    private String username;
+    
+    @Column(name = "password", nullable = false)
+    private String password;
+    
     private int age;
+    
     private String medicalCondition;
+    
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<HealthMetrics> healthMetrics;
 

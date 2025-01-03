@@ -6,6 +6,7 @@ import com.pp.smarthealth.model.Patient;
 import com.pp.smarthealth.repository.PatientRepository;
 import com.pp.smarthealth.service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,8 +19,11 @@ public class PatientServiceImpl implements PatientService {
 	@Autowired
 	private PatientRepository patientRepository;
 
+	 private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+	
 	@Override
 	public PatientDTO savePatient(Patient patient) {
+		   patient.setPassword(passwordEncoder.encode(patient.getPassword()));
 		Patient savedPatient = patientRepository.save(patient);
 		return convertToDTO(savedPatient);
 	}

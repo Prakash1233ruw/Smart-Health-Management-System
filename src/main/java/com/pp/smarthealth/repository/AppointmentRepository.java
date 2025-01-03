@@ -12,13 +12,7 @@ import com.pp.smarthealth.model.Appointment;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
-//	 @Query("SELECT a FROM Appointment a WHERE " +
-//	           "a.patient.name LIKE %:keyword% OR " +
-//	           "a.patient.age = :keywordInt OR " +
-//	           "a.patient.medicalCondition LIKE %:keyword%")
-//	          // + "OR " +
-//	        //   "a.patient.email LIKE %:keyword%")
-//	    List<Appointment> findByPatientDetails(@Param("keyword") String keyword, @Param("keywordInt") int keywordInt);
+    List<Appointment> findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(Long doctorId, LocalDateTime dateTime);
 
 	 @Query("SELECT a FROM Appointment a WHERE a.dateTime BETWEEN :start AND :end")
 	    List<Appointment> findAppointmentsForNextDay(LocalDateTime start, LocalDateTime end);

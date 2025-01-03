@@ -30,7 +30,7 @@ public class PatientController {
     private PatientService patientService;
     
     @Operation(summary = "POST Operation ", description = "adding a patient")
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<PatientDTO> createPatient(@RequestBody Patient patient) {
         PatientDTO createdPatient = patientService.savePatient(patient);
         return ResponseEntity.ok(createdPatient);

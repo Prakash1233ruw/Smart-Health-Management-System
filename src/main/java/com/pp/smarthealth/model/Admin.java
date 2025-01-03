@@ -1,18 +1,16 @@
 package com.pp.smarthealth.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
-import java.util.List;
-
 @Entity
-@Table(name = "doctors")
+@Table(name = "admins")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Doctor {
+public class Admin {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,21 +18,13 @@ public class Doctor {
 
     @Column(name = "name", nullable = false)
     private String name;
-
+    
     @Column(name = "username", nullable = false)
     private String username;
-    
+
     @Column(name = "password", nullable = false)
     private String password;
-    
-    @Column(name = "specialization", nullable = false)
-    private String specialization;
-    
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
-
-    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Appointment> appointments;
-    
-	
 }
