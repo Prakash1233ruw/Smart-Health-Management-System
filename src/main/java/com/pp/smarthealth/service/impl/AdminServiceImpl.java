@@ -1,6 +1,5 @@
 package com.pp.smarthealth.service.impl;
 
-import com.pp.smarthealth.dto.UserRegistrationDTO;
 import com.pp.smarthealth.exception.ResourceNotFoundException;
 import com.pp.smarthealth.model.Admin;
 import com.pp.smarthealth.repository.AdminRepository;

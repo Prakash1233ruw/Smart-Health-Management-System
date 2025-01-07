@@ -17,7 +17,6 @@ public class AdminDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // You can add roles or authorities here
         return Collections.singletonList(() -> "ROLE_ADMIN");
     }
 

@@ -1,5 +1,6 @@
 package com.pp.smarthealth.service;
 
+import com.pp.smarthealth.dto.AppointmentDTO;
 import com.pp.smarthealth.dto.DoctorDTO;
 import com.pp.smarthealth.model.Appointment;
 import com.pp.smarthealth.model.Doctor;
@@ -12,5 +13,5 @@ public interface DoctorService {
     void deleteDoctor(Long id);
     DoctorDTO getDoctorById(Long id);
     List<DoctorDTO> getAllDoctors();
-	List<Appointment> getUpcomingAppointments(Long doctorId);
+	List<AppointmentDTO> getUpcomingAppointments(Long doctorId);
 }

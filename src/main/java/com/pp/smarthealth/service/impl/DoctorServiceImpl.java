@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.pp.smarthealth.dto.AppointmentDTO;
 import com.pp.smarthealth.dto.DoctorDTO;
 import com.pp.smarthealth.exception.ResourceNotFoundException;
 import com.pp.smarthealth.model.Appointment;
@@ -68,9 +69,13 @@ public class DoctorServiceImpl implements DoctorService {
     
    
     @Override
-    public List<Appointment> getUpcomingAppointments(Long doctorId) {
+    public List<AppointmentDTO> getUpcomingAppointments(Long doctorId) {
         LocalDateTime now = LocalDateTime.now();
-        return appointmentRepository.findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(doctorId, now);
+        List<Appointment> appointments = appointmentRepository.findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(doctorId, now);
+        return appointments.stream()
+                           .map(appointment -> new AppointmentDTO(appointment.getId(), appointment.getDateTime(),appointment.getDoctor().getId(),appointment.getPatient().getId(),appointment.getStatus(),appointment.getNotes()))
+                           .collect(Collectors.toList());
+       // return appointmentRepository.findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(doctorId, now);
     }
 
     private DoctorDTO convertToDTO(Doctor doctor) {

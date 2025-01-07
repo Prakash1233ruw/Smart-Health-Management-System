@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,40 +37,52 @@ public class PatientController {
         return ResponseEntity.ok(createdPatient);
     }
 
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<PatientDTO> getPatientById(@PathVariable Long id) {
         PatientDTO patient = patientService.getPatientById(id);
         return ResponseEntity.ok(patient);
     }
-
+    
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<PatientDTO>> getAllPatients() {
         List<PatientDTO> patients = patientService.getAllPatients();
         return ResponseEntity.ok(patients);
     }
 
+    
     @PutMapping("/{id}")
     public ResponseEntity<PatientDTO> updatePatient(@PathVariable Long id, @RequestBody Patient patientDetails) {
         PatientDTO updatedPatient = patientService.updatePatient(id, patientDetails);
         return ResponseEntity.ok(updatedPatient);
     }
 
+    
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePatient(@PathVariable Long id) {
         patientService.deletePatient(id);
         return ResponseEntity.noContent().build();
     }
     
+    
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping("/name/{name}")
     public ResponseEntity<List<PatientDTO>> getPatientsWithName(@PathVariable String name) {
     	List<PatientDTO> patients = patientService.searchPatientsWithName(name);
        return  new ResponseEntity<List<PatientDTO>>(patients,HttpStatus.OK);        
     }
+    
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping("/age/{age}")
     public ResponseEntity<?> getPatientsWithAge(@PathVariable int age) {
     	List<PatientDTO> patients = patientService.searchPatientsWithAge(age);
     	return  new ResponseEntity<List<PatientDTO>>(patients,HttpStatus.OK); 
     }
+    
+    
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping("/medicalCondition/{medicalCondition}")
     public ResponseEntity<List<PatientDTO>> getPatientsWithMedicalCondition(@PathVariable String medicalCondition) {
     	List<PatientDTO> patients = patientService.searchPatientsMedicalCondition(medicalCondition);

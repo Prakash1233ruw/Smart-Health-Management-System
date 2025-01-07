@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pp.smarthealth.dto.AppointmentDTO;
 import com.pp.smarthealth.dto.DoctorDTO;
 import com.pp.smarthealth.model.Appointment;
 import com.pp.smarthealth.model.Doctor;
@@ -36,30 +38,36 @@ public class DoctorController {
         return ResponseEntity.ok(createdDoctor);
     }
 
+    
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<DoctorDTO> updateDoctor(@PathVariable Long id, @RequestBody Doctor doctorDetails) {
         DoctorDTO updatedDoctor = doctorService.updateDoctor(id, doctorDetails);
         return ResponseEntity.ok(updatedDoctor);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDoctor(@PathVariable Long id) {
         doctorService.deleteDoctor(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<DoctorDTO> getDoctorById(@PathVariable Long id) {
         DoctorDTO doctor = doctorService.getDoctorById(id);
         return ResponseEntity.ok(doctor);
     }
     
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping("/upcoming-appointments/{doctorId}")
-    public ResponseEntity<List<Appointment>> getUpcomingAppointments(@PathVariable Long doctorId) {
-        List<Appointment> appointments = doctorService.getUpcomingAppointments(doctorId);
+    public ResponseEntity<List<AppointmentDTO>> getUpcomingAppointments(@PathVariable Long doctorId) {
+        List<AppointmentDTO> appointments = doctorService.getUpcomingAppointments(doctorId);
         return ResponseEntity.ok(appointments);
     }
-
+    
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<DoctorDTO>> getAllDoctors() {
         List<DoctorDTO> doctors = doctorService.getAllDoctors();
