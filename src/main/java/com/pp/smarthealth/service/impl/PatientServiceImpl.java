@@ -1,6 +1,7 @@
 package com.pp.smarthealth.service.impl;
 
 import com.pp.smarthealth.dto.PatientDTO;
+import com.pp.smarthealth.exception.PatientNotFoundException;
 import com.pp.smarthealth.exception.ResourceNotFoundException;
 import com.pp.smarthealth.model.Patient;
 import com.pp.smarthealth.repository.PatientRepository;
@@ -126,5 +127,12 @@ public class PatientServiceImpl implements PatientService {
 	public List<PatientDTO> searchPatients(String name, Integer age, String medicalCondition) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Long findPatientIdByUsername(String username) {
+		 Patient patient = patientRepository.findByUsername(username)
+                 .orElseThrow(() -> new PatientNotFoundException("No patient found with username: " + username));
+		return patient.getId();
 	}
 }

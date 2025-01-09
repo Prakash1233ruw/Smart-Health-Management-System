@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pp.smarthealth.dto.AppointmentDTO;
 import com.pp.smarthealth.service.AppointmentService;
+import com.pp.smarthealth.service.PatientService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,9 +30,24 @@ public class AppointmentController {
 
     @Autowired
     private AppointmentService appointmentService;
+    
+    @Autowired
+    private PatientService patientService;
+    
     @Operation(summary = "POST Operation ", description = "scheduling the appointment")
     @PostMapping
-    public ResponseEntity<AppointmentDTO> createAppointment(@RequestBody AppointmentDTO appointmentDTO) {
+    public ResponseEntity<?> createAppointment(@RequestBody AppointmentDTO appointmentDTO) {
+    	 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	 String username=null;
+         if (authentication != null && authentication.isAuthenticated()) {
+              username = authentication.getName();
+         }else {
+        	   return ResponseEntity.status(403).body("patient not authenticated!");
+         }
+         
+         Long patientId= patientService.findPatientIdByUsername(username);
+         
+    	appointmentDTO.setPatientId(patientId);
         AppointmentDTO createdAppointment = appointmentService.createAppointment(appointmentDTO);
         return ResponseEntity.ok(createdAppointment);
     }
@@ -39,12 +58,14 @@ public class AppointmentController {
         return ResponseEntity.ok(updatedAppointment);
     }
 
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<AppointmentDTO> getAppointmentById(@PathVariable Long id) {
         AppointmentDTO appointmentDTO = appointmentService.getAppointmentById(id);
         return ResponseEntity.ok(appointmentDTO);
     }
 
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<AppointmentDTO>> getAllAppointments() {
         List<AppointmentDTO> appointments = appointmentService.getAllAppointments();
@@ -57,6 +78,7 @@ public class AppointmentController {
         return ResponseEntity.noContent().build();
     }
     
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @PostMapping("/send-reminders")
     @Operation(summary = "Send appointment reminders", description = "Send email reminders for upcoming appointments")
     public ResponseEntity<Void> sendAppointmentReminders() {
