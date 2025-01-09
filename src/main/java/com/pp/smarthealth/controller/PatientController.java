@@ -100,26 +100,6 @@ public class PatientController {
     }
     
    
-    @GetMapping("/myhealthreports")
-    public ResponseEntity<?> getHealthReports(Principal principal) {
-        try {
-            
-            List<HealthMetricsDTO> healthReports = healthMetricsService.getHealthMetricsByUsername(principal.getName());
-            return ResponseEntity.ok(healthReports);
-        } catch (PatientNotFoundException e) {
-           
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorDetails("Patient not found", e.getMessage()));
-        } catch (HealthMetricsNotFoundException e) {
-           
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorDetails("No health reports found", e.getMessage()));
-        } catch (Exception e) {
-         
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorDetails("An unexpected error occurred", e.getMessage()));
-        }
-    }
-    
+   
 
 }
