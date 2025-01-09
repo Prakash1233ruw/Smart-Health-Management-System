@@ -11,6 +11,8 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import io.jsonwebtoken.security.SignatureException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -52,5 +54,17 @@ public class GlobalExceptionHandler {
         response.put("path", "Accessing restricted resource");
 
         return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+    }
+    
+    @ExceptionHandler(SignatureException.class)
+    public ResponseEntity<Object> handleSignatureException(SignatureException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.UNAUTHORIZED.value());
+        errorResponse.put("error", "Unauthorized");
+        errorResponse.put("message", "Invalid JWT signature: " + ex.getMessage());
+        errorResponse.put("path", ""); // Set the specific path if needed
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 }

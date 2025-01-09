@@ -2,6 +2,8 @@ package com.pp.smarthealth.service.impl;
 
 import com.pp.smarthealth.dto.HealthMetricsDTO;
 import com.pp.smarthealth.dto.PatientDTO;
+import com.pp.smarthealth.exception.HealthMetricsNotFoundException;
+import com.pp.smarthealth.exception.PatientNotFoundException;
 import com.pp.smarthealth.model.HealthMetrics;
 import com.pp.smarthealth.model.Patient;
 import com.pp.smarthealth.repository.HealthMetricsRepository;
@@ -79,7 +81,9 @@ public class HealthMetricsServiceImpl implements HealthMetricsService {
                 healthMetrics.getHeight(),
                 healthMetrics.getWaistCircumference(),
                 healthMetrics.getPhysicalActivityLevel(),
-                healthMetrics.getPatient().getId() // Only passing patientId here
+                healthMetrics.getPatient().getId(),
+                healthMetrics.getPatient().getName() 
+               
         );
     }
 
@@ -107,4 +111,42 @@ public class HealthMetricsServiceImpl implements HealthMetricsService {
                 patient // Mapping the Patient object
         );
     }
+
+	@Override
+	public boolean isAccessAllowed(Long patientId, String username) {
+	
+		  Patient patient = patientRepository.findById(patientId)
+	                .orElseThrow(() -> new RuntimeException("Patient not found"));
+
+	        return patient.getUsername().equals(username);
+	}
+
+	@Override
+	public List<HealthMetricsDTO> getHealthMetricsByUsername(String username) {
+		 try {
+	         
+	            Patient patient = patientRepository.findByUsername(username)
+	                    .orElseThrow(() -> new PatientNotFoundException("No patient found with username: " + username));
+
+	          
+	            List<HealthMetrics> healthMetricsList = healthMetricsRepository.findByPatient(patient);
+
+	            if (healthMetricsList.isEmpty()) {
+	                throw new HealthMetricsNotFoundException("No health metrics found for the patient: " + username);
+	            }
+
+	           
+	            return healthMetricsList.stream()
+	                    .map(this::convertToDTO)
+	                    .collect(Collectors.toList());
+
+	        } catch (PatientNotFoundException | HealthMetricsNotFoundException e) {
+	          
+	            throw e;
+	        } catch (Exception e) {
+	            
+	            System.err.println("Error occurred while fetching health metrics: " + e.getMessage());
+	            throw new RuntimeException("Internal server error while processing health metrics");
+	        }
+	}
 }

@@ -30,6 +30,6 @@ public class HealthMetricsDTO {
     private Double height;
     private Double waistCircumference;
     private Integer physicalActivityLevel;
- 
-    private Long patientId; // Only store patientId
+    private Long patientId; 
+    private String patientName;
 }

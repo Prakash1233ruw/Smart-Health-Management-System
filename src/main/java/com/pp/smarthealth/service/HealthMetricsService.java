@@ -13,4 +13,8 @@ public interface HealthMetricsService {
     HealthMetricsDTO getHealthMetricsById(Long id);
 
     List<HealthMetricsDTO> getHealthMetricsByPatientId(Long patientId);
+    
+    boolean isAccessAllowed(Long patientId, String username);
+
+	List<HealthMetricsDTO> getHealthMetricsByUsername(String name);
 }
