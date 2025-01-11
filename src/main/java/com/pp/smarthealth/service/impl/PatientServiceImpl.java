@@ -1,24 +1,31 @@
 package com.pp.smarthealth.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.pp.smarthealth.dto.PatientDTO;
 import com.pp.smarthealth.exception.PatientNotFoundException;
 import com.pp.smarthealth.exception.ResourceNotFoundException;
 import com.pp.smarthealth.model.Patient;
+import com.pp.smarthealth.repository.AppointmentRepository;
 import com.pp.smarthealth.repository.PatientRepository;
 import com.pp.smarthealth.service.PatientService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PatientServiceImpl implements PatientService {
 
 	@Autowired
 	private PatientRepository patientRepository;
+	
+	@Autowired
+	private AppointmentRepository appointmentRepository;
 
 	 private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 	
@@ -42,10 +49,18 @@ public class PatientServiceImpl implements PatientService {
 	}
 
 	@Override
-	public void deletePatient(Long id) {
-		Patient patient = patientRepository.findById(id)
-				.orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + id));
-		patientRepository.delete(patient);
+	@Transactional
+	public void deletePatient(Long patientId) {
+
+		
+		appointmentRepository.deleteByPatientId(patientId);
+
+		try {
+		    patientRepository.deleteById(patientId);
+		} catch (DataIntegrityViolationException e) {
+		    throw new IllegalStateException("Cannot delete patient with existing appointments. Please delete the appointments first.");
+		}
+
 	}
 
 	@Override

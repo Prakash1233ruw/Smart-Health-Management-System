@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,4 +20,9 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 	    List<Appointment> findAppointmentsForNextDay(LocalDateTime start, LocalDateTime end);
 	 
 	 List<Appointment> findByPatient(Patient patient);
+	 
+	 @Modifying
+	 @Query("DELETE FROM Appointment a WHERE a.patient.id = :patientId")
+	 void deleteByPatientId(@Param("patientId") Long patientId);
+
 }

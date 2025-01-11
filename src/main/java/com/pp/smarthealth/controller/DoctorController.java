@@ -67,6 +67,17 @@ public class DoctorController {
         return ResponseEntity.ok(appointments);
     }
     
+    @GetMapping("/myupcoming-appointments")
+    public ResponseEntity<?> getUpcomingAppointments() {
+        try {
+            List<AppointmentDTO> appointments = doctorService.getUpcomingAppointments();
+            return ResponseEntity.ok(appointments);
+        } catch (RuntimeException e) {
+            // Handle service layer errors
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<DoctorDTO>> getAllDoctors() {

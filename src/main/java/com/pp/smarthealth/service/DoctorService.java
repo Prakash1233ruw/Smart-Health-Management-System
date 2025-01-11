@@ -14,4 +14,5 @@ public interface DoctorService {
     DoctorDTO getDoctorById(Long id);
     List<DoctorDTO> getAllDoctors();
 	List<AppointmentDTO> getUpcomingAppointments(Long doctorId);
+	List<AppointmentDTO> getUpcomingAppointments();
 }

@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.pp.smarthealth.dto.AppointmentDTO;
 import com.pp.smarthealth.dto.DoctorDTO;
@@ -75,7 +77,6 @@ public class DoctorServiceImpl implements DoctorService {
         return appointments.stream()
                            .map(appointment -> new AppointmentDTO(appointment.getId(), appointment.getDateTime(),appointment.getDoctor().getId(),appointment.getPatient().getId(),appointment.getStatus(),appointment.getNotes()))
                            .collect(Collectors.toList());
-       // return appointmentRepository.findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(doctorId, now);
     }
 
     private DoctorDTO convertToDTO(Doctor doctor) {
@@ -85,4 +86,25 @@ public class DoctorServiceImpl implements DoctorService {
             doctor.getSpecialization()
         );
     }
+
+	@Override
+	public List<AppointmentDTO> getUpcomingAppointments() {
+		
+		        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		        String username = authentication != null && authentication.isAuthenticated() ? authentication.getName() : null;
+
+		        if (username == null) {
+		            throw new RuntimeException("Unable to authenticate the user.");
+		        }
+
+		        Doctor doctor = doctorRepository.findByUsername(username)
+		                .orElseThrow(() -> new RuntimeException("Doctor not found for username: " + username));
+
+		        LocalDateTime now = LocalDateTime.now();
+		        List<Appointment> appointments = appointmentRepository.findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(doctor.getId(), now);
+		        return appointments.stream()
+		                           .map(appointment -> new AppointmentDTO(appointment.getId(), appointment.getDateTime(),appointment.getDoctor().getId(),appointment.getPatient().getId(),appointment.getStatus(),appointment.getNotes()))
+		                           .collect(Collectors.toList());
+		    
+}
 }
