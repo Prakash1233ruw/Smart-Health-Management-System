@@ -16,4 +16,5 @@ public interface PatientService {
 	List<PatientDTO> searchPatientsMedicalCondition(String medicalCondition);
 	List<PatientDTO> searchPatients(String name, Integer age, String medicalCondition);
     Long findPatientIdByUsername(String username);
+	Patient findPatientByUsername(String username);
 }

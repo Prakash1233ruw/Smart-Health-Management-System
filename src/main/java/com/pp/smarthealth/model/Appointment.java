@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,6 +20,7 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @FutureOrPresent
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 
@@ -29,5 +32,7 @@ public class Appointment {
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
     private String status;
+    
+    @Column(name = "notes", length = 500)
     private String notes;
 }

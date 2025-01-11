@@ -36,6 +36,7 @@ public class PatientServiceImpl implements PatientService {
 		patient.setName(patientDetails.getName());
 		patient.setAge(patientDetails.getAge());
 		patient.setMedicalCondition(patientDetails.getMedicalCondition());
+		patient.setEmail(patientDetails.getEmail());
 		Patient updatedPatient = patientRepository.save(patient);
 		return convertToDTO(updatedPatient);
 	}
@@ -134,5 +135,12 @@ public class PatientServiceImpl implements PatientService {
 		 Patient patient = patientRepository.findByUsername(username)
                  .orElseThrow(() -> new PatientNotFoundException("No patient found with username: " + username));
 		return patient.getId();
+	}
+	
+	@Override
+	public Patient findPatientByUsername(String username) {
+		 Patient patient = patientRepository.findByUsername(username)
+                 .orElseThrow(() -> new PatientNotFoundException("No patient found with username: " + username));
+		return patient;
 	}
 }

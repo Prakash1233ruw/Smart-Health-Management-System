@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.pp.smarthealth.model.Appointment;
+import com.pp.smarthealth.model.Patient;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
@@ -16,4 +17,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
 	 @Query("SELECT a FROM Appointment a WHERE a.dateTime BETWEEN :start AND :end")
 	    List<Appointment> findAppointmentsForNextDay(LocalDateTime start, LocalDateTime end);
+	 
+	 List<Appointment> findByPatient(Patient patient);
 }

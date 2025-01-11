@@ -1,5 +1,6 @@
 package com.pp.smarthealth.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pp.smarthealth.dto.AppointmentDTO;
+import com.pp.smarthealth.model.Patient;
 import com.pp.smarthealth.service.AppointmentService;
 import com.pp.smarthealth.service.PatientService;
 
@@ -72,12 +74,12 @@ public class AppointmentController {
         return ResponseEntity.ok(appointments);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
-        appointmentService.deleteAppointment(id);
-        return ResponseEntity.noContent().build();
-    }
-    
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<Void> deleteAppointment(@PathVariable Long id) {
+//        appointmentService.deleteAppointment(id);
+//        return ResponseEntity.noContent().build();
+//    }
+//    
     @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @PostMapping("/send-reminders")
     @Operation(summary = "Send appointment reminders", description = "Send email reminders for upcoming appointments")
@@ -85,4 +87,53 @@ public class AppointmentController {
         appointmentService.sendAppointmentReminders();
         return ResponseEntity.ok().build();
     }
+    
+    @Operation(summary = "GET Operation", description = "List all appointments of the logged-in patient")
+    @GetMapping("/myappointments")
+    public ResponseEntity<List<AppointmentDTO>> getMyAppointments() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = null;
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            username = authentication.getName();
+        } else {
+            return ResponseEntity.status(403).body(Collections.emptyList());
+        }
+
+        Patient patient = patientService.findPatientByUsername(username);
+        if (patient == null) {
+            return ResponseEntity.status(404).body(Collections.emptyList());
+        }
+
+        List<AppointmentDTO> appointments = appointmentService.findAppointmentsByPatient(patient);
+        return ResponseEntity.ok(appointments);
+    }
+    
+    
+    @Operation(summary = "DELETE Operation", description = "Cancel an appointment")
+    @DeleteMapping("/{appointmentId}")
+    public ResponseEntity<?> cancelAppointment(@PathVariable Long appointmentId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = null;
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            username = authentication.getName();
+        } else {
+            return ResponseEntity.status(403).body("User not authenticated!");
+        }
+
+        Long patientId = patientService.findPatientIdByUsername(username);
+        if (patientId == null) {
+            return ResponseEntity.status(404).body("Patient ID not found for the user: " + username);
+        }
+
+        boolean isCanceled = appointmentService.cancelAppointment(appointmentId, patientId);
+        if (isCanceled) {
+            return ResponseEntity.ok("Appointment canceled successfully.");
+        } else {
+            return ResponseEntity.status(403).body("You are not authorized to cancel this appointment.");
+        }
+    }
+
+
 }

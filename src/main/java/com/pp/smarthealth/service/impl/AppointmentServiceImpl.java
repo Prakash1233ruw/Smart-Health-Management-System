@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -131,22 +132,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentDTO;
     }
     
-    
-//    @Override
-//    public AppointmentDTO scheduleAppointment(Appointment appointment) {
-//        Appointment savedAppointment = appointmentRepository.save(appointment);
-//        Map<String, Object> templateModel = new HashMap<>();
-//        templateModel.put("name", appointment.getPatient().getName());
-//        templateModel.put("appointmentDateTime", appointment.getDateTime().toString());
-//
-//        try {
-//            emailService.sendEmailWithTemplate(appointment.getPatient().getEmail(), "Appointment Scheduled", "appointment-reminder", templateModel);
-//        } catch (MessagingException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return new AppointmentDTO(savedAppointment);
-//    }
+
 
     @Scheduled(cron = "0 0 9 * * ?") // Adjust the cron expression as needed
     public void sendAppointmentReminders() {
@@ -174,23 +160,33 @@ public class AppointmentServiceImpl implements AppointmentService {
         // Implement similar to sendAppointmentReminders
     }
     
-//  @Override
-//  public AppointmentDTO createAppointment(AppointmentDTO appointmentDTO) {
-//      Doctor doctor = doctorRepository.findById(appointmentDTO.getDoctorId())
-//              .orElseThrow(() -> new RuntimeException("Doctor not found"));
-//      
-//      Patient patient = patientRepository.findById(appointmentDTO.getPatientId())
-//              .orElseThrow(() -> new RuntimeException("Patient not found"));
-//
-//      Appointment appointment = new Appointment();
-//      appointment.setDateTime(appointmentDTO.getDateTime());
-//      appointment.setDoctor(doctor);
-//      appointment.setPatient(patient);
-//      appointment.setStatus(appointmentDTO.getStatus());
-//      appointment.setNotes(appointmentDTO.getNotes());
-//
-//      Appointment savedAppointment = appointmentRepository.save(appointment);
-//
-//      return convertToDTO(savedAppointment);
-//  }
+    
+    @Override 
+    public List<AppointmentDTO> findAppointmentsByPatient(Patient patient) {
+        List<Appointment> appointments = appointmentRepository.findByPatient(patient);
+        return appointments.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+
+	@Override
+	public boolean cancelAppointment(Long appointmentId, Long patientId) {
+		 Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
+
+	        if (appointmentOpt.isPresent()) {
+	            Appointment appointment = appointmentOpt.get();
+
+	            // Ensure the patient who booked the appointment is canceling it
+	            if (appointment.getPatient().getId().equals(patientId)) {
+	                appointment.setStatus("Canceled");
+	                appointmentRepository.save(appointment);
+	                return true;
+	            }
+	        }
+
+	        return false;
+	    }
+ 
 }
