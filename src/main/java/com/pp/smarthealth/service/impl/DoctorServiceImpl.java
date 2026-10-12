@@ -75,7 +75,7 @@ public class DoctorServiceImpl implements DoctorService {
         LocalDateTime now = LocalDateTime.now();
         List<Appointment> appointments = appointmentRepository.findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(doctorId, now);
         return appointments.stream()
-                           .map(appointment -> new AppointmentDTO(appointment.getId(), appointment.getDateTime(),appointment.getDoctor().getId(),appointment.getPatient().getId(),appointment.getStatus(),appointment.getNotes()))
+                           .map(appointment -> new AppointmentDTO(appointment.getId(), appointment.getDateTime(),appointment.getDoctor().getId(),appointment.getPatient().getId(),appointment.getStatus(),appointment.getNotes(),appointment.getQuestions()))
                            .collect(Collectors.toList());
     }
 
@@ -103,7 +103,7 @@ public class DoctorServiceImpl implements DoctorService {
 		        LocalDateTime now = LocalDateTime.now();
 		        List<Appointment> appointments = appointmentRepository.findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(doctor.getId(), now);
 		        return appointments.stream()
-		                           .map(appointment -> new AppointmentDTO(appointment.getId(), appointment.getDateTime(),appointment.getDoctor().getId(),appointment.getPatient().getId(),appointment.getStatus(),appointment.getNotes()))
+		                           .map(appointment -> new AppointmentDTO(appointment.getId(), appointment.getDateTime(),appointment.getDoctor().getId(),appointment.getPatient().getId(),appointment.getStatus(),appointment.getNotes(),appointment.getQuestions()))
 		                           .collect(Collectors.toList());
 		    
 }

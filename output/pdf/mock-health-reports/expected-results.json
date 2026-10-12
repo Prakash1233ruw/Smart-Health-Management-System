@@ -1,0 +1,142 @@
+[
+  {
+    "file": "01-baseline-report.pdf",
+    "patientName": "Aarav Demo",
+    "recordedDate": "2026-09-20",
+    "values": {
+      "systolicPressure": 118,
+      "diastolicPressure": 76,
+      "heartRate": 72,
+      "temperature": 36.8,
+      "respiratoryRate": 16,
+      "bloodOxygenLevel": 98,
+      "bloodGlucoseLevel": 98,
+      "totalCholesterol": 198,
+      "hdlCholesterol": 52,
+      "ldlCholesterol": 118,
+      "triglycerides": 140,
+      "weight": 76.0,
+      "height": 174,
+      "bmi": 25.1,
+      "waistCircumference": 90,
+      "physicalActivityLevel": 150
+    },
+    "units": {
+      "systolicPressure": "mmHg",
+      "diastolicPressure": "mmHg",
+      "heartRate": "bpm",
+      "temperature": "°C",
+      "respiratoryRate": "breaths/min",
+      "bloodOxygenLevel": "%",
+      "bloodGlucoseLevel": "mg/dL",
+      "totalCholesterol": "mg/dL",
+      "hdlCholesterol": "mg/dL",
+      "ldlCholesterol": "mg/dL",
+      "triglycerides": "mg/dL",
+      "weight": "kg",
+      "height": "cm",
+      "bmi": "kg/m²",
+      "waistCircumference": "cm",
+      "physicalActivityLevel": "minutes/week"
+    }
+  },
+  {
+    "file": "02-follow-up-report.pdf",
+    "patientName": "Aarav Demo",
+    "recordedDate": "2026-09-27",
+    "values": {
+      "systolicPressure": 128,
+      "diastolicPressure": 82,
+      "heartRate": 84,
+      "temperature": 37.4,
+      "respiratoryRate": 18,
+      "bloodOxygenLevel": 97,
+      "bloodGlucoseLevel": 112,
+      "totalCholesterol": 210,
+      "hdlCholesterol": 49,
+      "ldlCholesterol": 130,
+      "triglycerides": 165,
+      "weight": 77.2,
+      "height": 174,
+      "bmi": 25.5,
+      "waistCircumference": 92,
+      "physicalActivityLevel": 110
+    },
+    "units": {
+      "systolicPressure": "mmHg",
+      "diastolicPressure": "mmHg",
+      "heartRate": "bpm",
+      "temperature": "°C",
+      "respiratoryRate": "breaths/min",
+      "bloodOxygenLevel": "%",
+      "bloodGlucoseLevel": "mg/dL",
+      "totalCholesterol": "mg/dL",
+      "hdlCholesterol": "mg/dL",
+      "ldlCholesterol": "mg/dL",
+      "triglycerides": "mg/dL",
+      "weight": "kg",
+      "height": "cm",
+      "bmi": "kg/m²",
+      "waistCircumference": "cm",
+      "physicalActivityLevel": "minutes/week"
+    }
+  },
+  {
+    "file": "03-different-units-report.pdf",
+    "patientName": "Aarav Demo",
+    "recordedDate": "2026-10-01",
+    "values": {
+      "systolicPressure": 126,
+      "diastolicPressure": 80,
+      "heartRate": 82,
+      "temperature": 98.6,
+      "respiratoryRate": 18,
+      "bloodOxygenLevel": 98,
+      "bloodGlucoseLevel": 6.4,
+      "totalCholesterol": 5.4,
+      "hdlCholesterol": 1.3,
+      "ldlCholesterol": 3.2,
+      "triglycerides": 1.8,
+      "weight": 169.0,
+      "height": 68.5,
+      "bmi": 25.3,
+      "waistCircumference": 36.2,
+      "physicalActivityLevel": 120
+    },
+    "units": {
+      "systolicPressure": "mmHg",
+      "diastolicPressure": "mmHg",
+      "heartRate": "bpm",
+      "temperature": "°F",
+      "respiratoryRate": "breaths/min",
+      "bloodOxygenLevel": "%",
+      "bloodGlucoseLevel": "mmol/L",
+      "totalCholesterol": "mmol/L",
+      "hdlCholesterol": "mmol/L",
+      "ldlCholesterol": "mmol/L",
+      "triglycerides": "mmol/L",
+      "weight": "lb",
+      "height": "in",
+      "bmi": "kg/m²",
+      "waistCircumference": "in",
+      "physicalActivityLevel": "minutes/week"
+    }
+  },
+  {
+    "file": "05-scanned-follow-up.pdf",
+    "sameMeasurementsAs": "02-follow-up-report.pdf",
+    "textLayer": false,
+    "instruction": "Use as an alternative to report 02; do not save both for the same patient."
+  },
+  {
+    "file": "04-review-required-report.pdf",
+    "recordedDate": null,
+    "requiresReview": [
+      "Blood glucose is <110 mg/dL, not the scalar 110.",
+      "Weight 77.0 has no unit.",
+      "Hemoglobin and HbA1c are unsupported.",
+      "Total cholesterol result is 213 mg/dL; the fictional reference band is not a result."
+    ],
+    "instruction": "Leave the draft unconfirmed unless missing source information is obtained."
+  }
+]

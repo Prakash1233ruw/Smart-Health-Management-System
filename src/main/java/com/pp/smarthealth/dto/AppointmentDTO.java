@@ -17,4 +17,5 @@ public class AppointmentDTO {
     private Long patientId;
     private String status;
     private String notes;
+    private String questions;
 }

@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# React frontend
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/.env.local
+frontend/.env.*.local
+
+# Local frontend rollback snapshots
+/backups/

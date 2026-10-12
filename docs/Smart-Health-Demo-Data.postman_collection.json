@@ -1,0 +1,385 @@
+{
+  "info": {
+    "name": "Smart Health — Synthetic Demo Data",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Run Setup requests once in order against a local demo database. Creates two synthetic patients, one doctor, and two metric records through existing APIs. Captures real IDs and JWTs automatically. Registrations are not idempotent; reruns with the same usernames/emails fail. AI analysis is optional and separate. All passwords are local demo credentials. Numeric examples use degrees Celsius, kg, cm, and mg/dL where applicable; the existing database has no units fields."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "patientId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "otherPatientId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "doctorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "patientToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "doctorToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const now = new Date();",
+          "const pad = n => String(n).padStart(2, \"0\");",
+          "const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;",
+          "pm.variables.set(\"metricDate\", date);",
+          "pm.variables.set(\"metricTimestamp\", `${date}T${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`);"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Setup — run once in order",
+      "item": [
+        {
+          "name": "1. Register patient Aarav",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/patients/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Aarav Demo\",\n  \"username\": \"demo_patient_aarav\",\n  \"password\": \"DemoHealth@123\",\n  \"email\": \"aarav.demo@example.test\",\n  \"age\": 30,\n  \"medicalCondition\": \"No known chronic conditions reported\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Request succeeds\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.collectionVariables.set(\"patientId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2. Register second patient Meera",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/patients/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Meera Demo\",\n  \"username\": \"demo_patient_meera\",\n  \"password\": \"DemoHealth@123\",\n  \"email\": \"meera.demo@example.test\",\n  \"age\": 42,\n  \"medicalCondition\": \"History of asthma\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Request succeeds\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.collectionVariables.set(\"otherPatientId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Register doctor",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/doctors/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Dr. Kavya Demo\",\n  \"username\": \"demo_doctor_kavya\",\n  \"password\": \"DemoHealth@123\",\n  \"email\": \"kavya.demo@example.test\",\n  \"specialization\": \"General Medicine\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Request succeeds\", () => pm.response.to.have.status(200));",
+                  "if (pm.response.code === 200) pm.collectionVariables.set(\"doctorId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4. Login as doctor",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"demo_doctor_kavya\",\n  \"password\": \"DemoHealth@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Uses the synthetic demo account."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Request succeeds\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.unset(\"doctorToken\");",
+                  "if (pm.response.code === 200) pm.collectionVariables.set(\"doctorToken\", pm.response.text().replace(/^JWT Token:\\s*/, \"\").trim());"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Add Aarav health metrics",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{doctorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/healthmetrics",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": {{patientId}},\n  \"date\": \"{{metricDate}}\",\n  \"timestamp\": \"{{metricTimestamp}}\",\n  \"systolicPressure\": 118,\n  \"diastolicPressure\": 78,\n  \"heartRate\": 76,\n  \"temperature\": 36.8,\n  \"respiratoryRate\": 16,\n  \"bloodOxygenLevel\": 98,\n  \"bloodGlucoseLevel\": 95,\n  \"bmi\": 23.5,\n  \"weight\": 72,\n  \"height\": 175\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Request succeeds\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6. Add Meera health metrics",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{doctorToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/healthmetrics",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": {{otherPatientId}},\n  \"date\": \"{{metricDate}}\",\n  \"timestamp\": \"{{metricTimestamp}}\",\n  \"systolicPressure\": 122,\n  \"diastolicPressure\": 80,\n  \"heartRate\": 80,\n  \"temperature\": 36.9,\n  \"respiratoryRate\": 18,\n  \"bloodOxygenLevel\": 97,\n  \"bmi\": 24.2,\n  \"weight\": 62,\n  \"height\": 160\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Request succeeds\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7. Login as patient Aarav",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"demo_patient_aarav\",\n  \"password\": \"DemoHealth@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Uses the synthetic demo account."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Request succeeds\", () => pm.response.to.have.status(200));",
+                  "pm.collectionVariables.unset(\"patientToken\");",
+                  "if (pm.response.code === 200) pm.collectionVariables.set(\"patientToken\", pm.response.text().replace(/^JWT Token:\\s*/, \"\").trim());"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Optional — live AI test",
+      "item": [
+        {
+          "name": "8. Analyze Aarav symptoms (requires AI_API_KEY)",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{patientToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/ai/symptom-analysis",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": {{patientId}},\n  \"symptoms\": [\n    \"mild cough for two days\",\n    \"runny nose\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Optional live Gemini request. Run after setup with your Google AI Studio Gemini key set as AI_API_KEY on the backend."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Request succeeds\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

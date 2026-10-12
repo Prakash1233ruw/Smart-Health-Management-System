@@ -1,0 +1,1049 @@
+/* Visual reference: user-supplied body-weather.html and SmartHealth login HTML.
+   Scoped styles preserve the real React forms, authorization and API workflows. */
+:root {
+  font-family: Nunito, "Segoe UI", system-ui, sans-serif;
+}
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+body {
+  background: #0e0d28 !important;
+  font-family: Nunito, "Segoe UI", system-ui, sans-serif !important;
+}
+#root {
+  min-height: 100dvh;
+  width: 100%;
+  display: grid;
+  place-items: center;
+}
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+.reference-auth {
+  --sky1: #3b4a8f;
+  --sky2: #f7b98a;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: linear-gradient(180deg, var(--sky1), var(--sky2));
+  color: #fff;
+  overflow: hidden;
+}
+.reference-auth[data-role="doctor"] {
+  --sky1: #2a5c8f;
+  --sky2: #8fd0e0;
+}
+.reference-auth[data-role="admin"] {
+  --sky1: #1c1b4b;
+  --sky2: #5a4a7c;
+}
+.reference-auth-card {
+  position: relative;
+  width: 100%;
+  max-width: 410px;
+  background: rgba(14, 13, 40, 0.58);
+  backdrop-filter: blur(16px);
+  border-radius: 26px;
+  padding: 26px 24px;
+  z-index: 1;
+}
+.reference-auth h1 {
+  font:
+    800 26px/1.2 Nunito,
+    sans-serif;
+  color: #fff;
+  letter-spacing: normal;
+  margin: 0;
+}
+.reference-auth .ref-lead {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+.reference-auth .login-form {
+  width: auto;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+.reference-auth .ref-segment {
+  display: flex;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  padding: 4px;
+  margin-top: 20px;
+}
+.reference-auth .ref-segment button {
+  flex: 1;
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.75);
+  font:
+    600 14px Nunito,
+    sans-serif;
+  padding: 9px;
+  border-radius: 18px;
+  cursor: pointer;
+  box-shadow: none;
+}
+.reference-auth .ref-segment button[aria-selected="true"] {
+  background: #fff;
+  color: #14123a;
+}
+.reference-auth .role-switch {
+  display: flex;
+  gap: 8px;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 16px 0 0;
+}
+.reference-auth .role-switch button {
+  flex: 1;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: none;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 14px;
+  padding: 9px 4px;
+  box-shadow: none;
+}
+.reference-auth .role-switch button[aria-pressed="true"] {
+  border-color: #f2a65a;
+  background: rgba(242, 166, 90, 0.2);
+  color: #fff;
+}
+.reference-auth label {
+  display: block;
+  font-size: 13px;
+  color: #fff;
+  font-weight: 600;
+  margin: 14px 0 0;
+}
+.reference-auth input,
+.reference-auth select {
+  width: 100%;
+  font-size: 15px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid transparent;
+  border-radius: 14px;
+  padding: 12px 14px;
+  outline: none;
+  margin-top: 6px;
+  box-shadow: none;
+  min-width: 0;
+}
+.reference-auth input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+.reference-auth input:focus,
+.reference-auth select:focus {
+  border-color: #fff;
+}
+.reference-auth .measurement-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.reference-auth .primary {
+  width: 100%;
+  margin-top: 22px;
+  border: 0;
+  border-radius: 26px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 800;
+  background: #f2a65a;
+  color: #14123a;
+  box-shadow: none;
+  transform: none;
+}
+.reference-auth .ref-password {
+  position: relative;
+}
+.reference-auth .ref-password input {
+  padding-right: 62px;
+}
+.reference-auth .ref-eye {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-40%);
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px;
+}
+.reference-auth .ref-alt {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.reference-auth .ref-alt button {
+  border: 0;
+  background: none;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: underline;
+  padding: 0;
+}
+.reference-auth .notice {
+  margin-top: 14px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  color: #fff;
+  font-size: 13px;
+}
+.reference-auth .notice.error {
+  color: #ffb4a6;
+}
+.reference-auth .small.muted {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 14px 0 0;
+  line-height: 1.5;
+}
+.ref-sun {
+  position: absolute;
+  right: 30px;
+  top: 60px;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #ffe3a3;
+  box-shadow: 0 0 60px 20px rgba(255, 227, 163, 0.5);
+  pointer-events: none;
+  transition:
+    opacity 1.4s,
+    transform 1.4s;
+}
+.reference-auth > .ref-sun {
+  position: fixed;
+  right: 12%;
+  top: 8%;
+  width: 80px;
+  height: 80px;
+}
+.reference-auth[data-role="admin"] > .ref-sun {
+  opacity: 0;
+}
+.ref-cloud {
+  position: absolute;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.35);
+  filter: blur(10px);
+  animation: ref-drift 60s linear infinite;
+  pointer-events: none;
+}
+.ref-cloud.c1 {
+  width: 220px;
+  height: 60px;
+  top: 70px;
+  left: -240px;
+}
+.ref-cloud.c2 {
+  width: 160px;
+  height: 46px;
+  top: 150px;
+  left: -200px;
+  animation-duration: 85s;
+  animation-delay: -30s;
+}
+.ref-cloud.c3 {
+  width: 260px;
+  height: 70px;
+  top: 30px;
+  left: -300px;
+  animation-duration: 110s;
+  animation-delay: -60s;
+}
+.reference-auth > .ref-cloud {
+  position: fixed;
+  animation-name: ref-auth-drift;
+}
+@keyframes ref-drift {
+  to {
+    transform: translateX(760px);
+  }
+}
+@keyframes ref-auth-drift {
+  to {
+    transform: translateX(130vw);
+  }
+}
+@keyframes ref-breathe {
+  50% {
+    transform: scale(1.07);
+  }
+}
+.workspace.reference-shell {
+  --sky1: #4b5a86;
+  --sky2: #b9bfd0;
+  --ink: #fff;
+  --muted: rgba(255, 255, 255, 0.75);
+  --surface: rgba(14, 13, 40, 0.55);
+  --line: rgba(255, 255, 255, 0.2);
+  width: 100%;
+  max-width: 400px;
+  height: min(780px, 100dvh);
+  min-height: 0;
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 28px;
+  background: linear-gradient(180deg, var(--sky1), var(--sky2));
+  color: #fff;
+  isolation: isolate;
+}
+.reference-shell[data-sky="clear"] {
+  --sky1: #2a5c8f;
+  --sky2: #8fd0e0;
+}
+.reference-shell[data-sky="clouds"] {
+  --sky1: #4b5a86;
+  --sky2: #b9bfd0;
+}
+.reference-shell[data-sky="storm"] {
+  --sky1: #1c1b4b;
+  --sky2: #5a4a7c;
+}
+.reference-shell[data-sky="sunrise"] {
+  --sky1: #3b4a8f;
+  --sky2: #f7b98a;
+}
+.reference-shell[data-sky="storm"] > .ref-sun,
+.reference-shell[data-sky="clouds"] > .ref-sun {
+  opacity: 0;
+  transform: translateY(40px);
+}
+.reference-shell[data-sky="sunrise"] > .ref-sun {
+  transform: translateY(60px);
+}
+.reference-shell[data-sky="clear"] > .ref-cloud {
+  opacity: 0.25;
+}
+.reference-shell[data-sky="storm"] > .ref-cloud {
+  background: rgba(20, 18, 58, 0.7);
+}
+.ref-appearance {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  z-index: 5;
+}
+.ref-appearance button {
+  font-size: 11px;
+  font-weight: 600;
+  border: 0;
+  border-radius: 20px;
+  padding: 5px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  box-shadow: none;
+}
+.ref-appearance button[aria-pressed="true"] {
+  background: #fff;
+  color: #14123a;
+}
+.reference-shell .main-shell {
+  position: absolute;
+  inset: 44px 0 64px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff50 transparent;
+}
+.reference-shell .main-shell > main {
+  padding: 16px 20px 24px;
+  max-width: none;
+  margin: 0;
+}
+.reference-shell .sidebar {
+  position: absolute;
+  inset: auto 0 0;
+  height: 64px;
+  width: auto;
+  min-height: 0;
+  padding: 0;
+  background: rgba(14, 13, 40, 0.7);
+  backdrop-filter: blur(14px);
+  border: 0;
+  z-index: 10;
+  display: block;
+}
+.reference-shell .sidebar > :not(nav) {
+  display: none;
+}
+.reference-shell .sidebar nav {
+  display: flex;
+  flex-direction: row;
+  height: 64px;
+  width: 100%;
+  gap: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.reference-shell .sidebar nav button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: none;
+  min-width: 0;
+}
+.reference-shell .sidebar nav button svg,
+.reference-shell .weather-nav-label {
+  display: none;
+}
+.reference-shell .sidebar nav button.active {
+  color: #fff;
+  box-shadow: inset 0 3px #f2a65a;
+}
+.reference-shell .topbar {
+  position: static;
+  height: auto;
+  min-height: 0;
+  display: flex;
+  justify-content: flex-end;
+  border: 0;
+  background: transparent;
+  padding: 0 20px;
+  backdrop-filter: none;
+  margin: 0;
+}
+.reference-shell .topbar > span,
+.reference-shell .topbar .theme-switch,
+.reference-shell .topbar .connection {
+  display: none;
+}
+.reference-shell .topbar-right {
+  gap: 10px;
+}
+.reference-shell .topbar .secondary {
+  font-size: 11px;
+  background: none;
+  padding: 2px 0;
+  border: 0;
+  min-height: 0;
+  color: rgba(255, 255, 255, 0.75);
+}
+.reference-shell .mobile-signout {
+  display: flex;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.75);
+  width: 22px;
+  height: 22px;
+}
+.reference-shell .page-heading {
+  display: none;
+}
+.reference-shell h1 {
+  font-size: 25px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: normal;
+  color: #fff;
+  margin: 0;
+}
+.reference-shell h2 {
+  font-size: 21px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.25;
+  letter-spacing: normal;
+}
+.reference-shell h3 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: normal;
+}
+.reference-shell h4,
+.reference-shell label,
+.reference-shell strong {
+  color: #fff;
+}
+.workspace.reference-shell,
+.reference-shell h1,
+.reference-shell h2,
+.reference-shell h3,
+.reference-shell h4 {
+  font-family: Nunito, "Segoe UI", system-ui, sans-serif;
+}
+.reference-shell .ref-prep-label {
+  display: block;
+  font-size: 13px;
+  margin-top: 20px;
+}
+.reference-shell .ref-prep-label textarea {
+  margin-top: 8px;
+  min-height: 120px;
+  resize: vertical;
+}
+.reference-shell .ref-prep-button {
+  margin-top: 12px;
+}
+.reference-shell p {
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
+}
+.reference-shell .ref-sub {
+  font-size: 14px;
+  margin: 8px 0 0;
+}
+.ref-status {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  padding: 5px 12px;
+  backdrop-filter: blur(8px);
+}
+.ref-status i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f2a65a;
+  flex-shrink: 0;
+}
+.ref-orbs {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 6px;
+  margin-top: 30px;
+  height: 170px;
+}
+.ref-orb {
+  flex-shrink: 1;
+  min-width: 0;
+  border: 0;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: ref-breathe 5s ease-in-out infinite;
+  background: radial-gradient(
+    circle at 35% 30%,
+    rgba(255, 255, 255, 0.7),
+    var(--orb-color) 70%
+  );
+  box-shadow: 0 0 30px var(--orb-color);
+  padding: 0;
+}
+.ref-orb b {
+  font-size: 20px;
+  font-weight: 800;
+}
+.ref-orb span {
+  font-size: 11px;
+  font-weight: 600;
+}
+.reference-shell .ref-sheet {
+  margin-top: 22px;
+  background: rgba(14, 13, 40, 0.55);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 16px;
+  min-height: 104px;
+}
+.reference-shell .ref-sheet h3 {
+  margin: 0;
+}
+.reference-shell .ref-sheet p {
+  font-size: 13px;
+  margin: 6px 0 0;
+}
+.ref-number {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  color: #fff;
+  margin-top: 8px;
+}
+.reference-shell .primary {
+  background: #f2a65a;
+  color: #14123a;
+  border: 0;
+  border-radius: 24px;
+  padding: 12px 20px;
+  font-weight: 800;
+  box-shadow: none;
+  font-size: 14px;
+  transform: none;
+}
+.reference-shell .ref-sheet .primary {
+  margin-top: 12px;
+}
+.reference-shell .secondary {
+  background: #fff;
+  color: #14123a;
+  border: 0;
+  border-radius: 24px;
+  box-shadow: none;
+  font-size: 12px;
+  padding: 10px 14px;
+}
+.reference-shell .text-button {
+  color: #fff;
+}
+.reference-shell .panel {
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+.reference-shell .section-head {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.reference-shell .section-head h2 {
+  margin: 0;
+}
+.reference-shell .muted,
+.reference-shell .small,
+.reference-shell .eyebrow {
+  color: rgba(255, 255, 255, 0.75);
+}
+.reference-shell .eyebrow {
+  font-size: 10px;
+}
+.reference-shell .overview-heading {
+  margin-top: 22px;
+}
+.reference-shell .overview-heading h2 {
+  font-size: 16px;
+}
+.reference-shell .measurement-actions {
+  flex-wrap: wrap;
+}
+.reference-shell .patient-picker {
+  background: rgba(14, 13, 40, 0.55);
+  padding: 12px;
+  border: 0;
+  border-radius: 18px;
+  margin: 0 0 18px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+.reference-shell .patient-picker > div,
+.reference-shell .patient-picker > span {
+  display: none;
+}
+.reference-shell input,
+.reference-shell select,
+.reference-shell textarea {
+  width: 100%;
+  min-width: 0;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 14px;
+  box-shadow: none;
+}
+.reference-shell input::placeholder,
+.reference-shell textarea::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+.reference-shell select option {
+  color: #14123a;
+  background: #fff;
+}
+.reference-shell input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  accent-color: #f2a65a;
+}
+.reference-shell .notice,
+.reference-shell .empty,
+.reference-shell .booking-form,
+.reference-shell .cancel-confirm {
+  background: rgba(14, 13, 40, 0.55);
+  border: 0;
+  border-radius: 18px;
+  color: #fff;
+  padding: 16px;
+}
+.reference-shell .notice.error {
+  color: #ffb4a6;
+}
+.reference-shell .booking-form {
+  margin: 18px 0;
+}
+.reference-shell .measurement-grid,
+.reference-shell .visit-columns,
+.reference-shell .visit-trends {
+  grid-template-columns: 1fr;
+}
+.reference-shell .appointment-list {
+  display: grid;
+  gap: 16px;
+  margin: 20px 0;
+}
+.reference-shell .appointment-card {
+  display: grid;
+  grid-template-columns: 1fr 68px;
+  background: #fbf7ee;
+  color: #14123a;
+  border: 0;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: none;
+  gap: 10px;
+  min-width: 0;
+}
+.reference-shell .appointment-card:before,
+.reference-shell .appointment-card:after {
+  display: none;
+}
+.reference-shell .appointment-info {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+.reference-shell .appointment-date {
+  grid-column: 2;
+  grid-row: 1;
+  border: 0;
+  border-left: 2px dashed #cbbf9f;
+  border-radius: 0;
+  background: transparent;
+  color: #14123a;
+  padding: 0 0 0 14px;
+  width: auto;
+  min-width: 0;
+}
+.reference-shell .appointment-date strong {
+  color: #14123a;
+  font-size: 26px;
+}
+.reference-shell .appointment-date span {
+  color: #5b5878;
+}
+.reference-shell .appointment-info h3 {
+  color: #14123a;
+  font-size: 16px;
+}
+.reference-shell .appointment-info p,
+.reference-shell .ticket-countdown {
+  color: #5b5878;
+  font-size: 12px;
+  background: none;
+}
+.reference-shell .appointment-actions {
+  grid-column: 1/-1;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  padding: 0;
+}
+.reference-shell .appointment-actions .secondary {
+  background: #e8dfcf;
+  color: #14123a;
+}
+.reference-shell .appointment-actions .text-button {
+  color: #a0443a;
+}
+.reference-shell .visit-panel {
+  background: rgba(14, 13, 40, 0.65) !important;
+  padding: 16px;
+  border: 0;
+  border-radius: 20px;
+  color: #fff;
+  margin: 20px 0;
+}
+.reference-shell .visit-banner {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 16px;
+}
+.reference-shell .visit-trends article {
+  padding: 12px;
+  border-color: #ffffff30;
+}
+.reference-shell .visit-brief summary {
+  background: transparent;
+  color: #fff;
+  border: 0;
+  padding: 8px 0;
+}
+.reference-shell .visit-values div {
+  gap: 8px;
+  font-size: 12px;
+}
+.reference-shell .visit-step {
+  color: #f2c27a;
+}
+.reference-shell .visit-editor label {
+  font-size: 13px;
+}
+.reference-shell .visit-editor textarea {
+  line-height: 1.6;
+}
+.reference-shell .visit-editor .primary {
+  padding: 12px;
+  width: 100%;
+}
+.reference-shell .visit-checklist label {
+  color: #fff;
+}
+.reference-shell .visit-followup {
+  display: block;
+}
+.reference-shell .visit-followup button {
+  margin-top: 12px;
+}
+.reference-shell .visit-gaps {
+  font-size: 12px;
+}
+.reference-shell .visit-gaps ul {
+  padding-left: 16px;
+}
+.reference-shell .badge {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+.reference-shell .appointment-actions .badge {
+  background: #d9e6d9;
+  color: #2c553a;
+}
+.reference-shell footer {
+  font-size: 10px;
+  border: 0;
+  margin-top: 24px;
+  display: block;
+  opacity: 0.7;
+}
+.reference-shell footer > span:last-child {
+  display: none;
+}
+.reference-shell .timeline {
+  display: block;
+  overflow: visible;
+  padding: 0;
+  background: none;
+}
+.reference-shell .timeline:before {
+  display: none;
+}
+.reference-shell .timeline-event {
+  display: block;
+  min-width: 0;
+  width: auto;
+  margin: 16px 0 0;
+  padding: 16px;
+  background: rgba(14, 13, 40, 0.55);
+  border: 0;
+  border-radius: 20px;
+  box-shadow: none;
+}
+.reference-shell .event-icon {
+  display: none;
+}
+.reference-shell .event-body {
+  padding: 0;
+}
+.reference-shell .event-body h3 {
+  font-size: 15px;
+}
+.reference-shell .event-body p,
+.reference-shell .timeline-metric,
+.reference-shell .event-body time {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.reference-shell .event-body details {
+  background: transparent;
+  border-color: #ffffff30;
+}
+.reference-shell .timeline-metric {
+  background: rgba(255, 255, 255, 0.12);
+  border: 0;
+  color: #fff;
+}
+.reference-shell .timeline-metric span,
+.reference-shell .timeline-metric strong {
+  color: #fff;
+}
+.reference-shell .readings > span {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  border: 0;
+}
+.reference-shell .readings strong {
+  color: #fff;
+}
+.reference-shell .readings > span {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  border: 0;
+}
+.reference-shell .readings strong {
+  color: #fff;
+}
+.reference-shell footer span {
+  color: rgba(255, 255, 255, 0.75);
+}
+.reference-shell .pagination {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ref-river {
+  margin-top: 20px;
+  display: flex;
+  overflow-x: auto;
+  gap: 0;
+  padding: 50px 10px;
+  position: relative;
+  scroll-snap-type: x proximity;
+  isolation: isolate;
+}
+.ref-river:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 46px;
+  transform: translateY(-50%);
+  width: max(100%, 1000px);
+  background: linear-gradient(
+    90deg,
+    rgba(79, 195, 201, 0.1),
+    rgba(79, 195, 201, 0.45),
+    rgba(79, 195, 201, 0.1)
+  );
+  border-radius: 30px;
+  z-index: -1;
+}
+.ref-stone {
+  flex: 0 0 92px;
+  width: 92px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  scroll-snap-align: center;
+  border: 0;
+  background: none;
+  color: #fff;
+  padding: 0;
+}
+.ref-stone i {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--stone-color, #4fc3c9);
+  box-shadow: 0 0 16px var(--stone-color, #4fc3c9);
+  margin: 7px 0;
+}
+.ref-stone[aria-pressed="true"] i {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+.ref-stone small {
+  font-size: 10px;
+  position: absolute;
+  width: 88px;
+  text-align: center;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.ref-stone:nth-child(odd) small {
+  top: -36px;
+}
+.ref-stone:nth-child(even) small {
+  bottom: -36px;
+}
+.reference-auth button:focus-visible,
+.reference-shell button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+.reference-auth button:disabled,
+.reference-shell button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.control-tower {
+  width: min(100%, 1000px);
+  min-height: 100dvh;
+  background: linear-gradient(180deg, #1c1b4b, #5a4a7c);
+  color: #fff;
+}
+.control-tower .tower-header {
+  background: rgba(14, 13, 40, 0.7);
+  color: #fff;
+}
+.control-tower .panel,
+.control-tower .tower-counts button {
+  background: #f7f5fc;
+}
+.control-tower .tower-header .brand,
+.control-tower .tower-header .eyebrow {
+  color: #fff;
+}
+@media (max-width: 430px) {
+  .workspace.reference-shell {
+    border-radius: 0;
+    height: 100dvh;
+    max-width: none;
+  }
+  .reference-auth .measurement-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ref-cloud,
+  .ref-orb {
+    animation: none !important;
+  }
+  .reference-shell *,
+  .reference-auth * {
+    transition: none !important;
+  }
+}

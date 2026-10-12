@@ -38,6 +38,7 @@ public class AppointmentController {
     
     @Operation(summary = "POST Operation ", description = "scheduling the appointment")
     @PostMapping
+    @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<?> createAppointment(@RequestBody AppointmentDTO appointmentDTO) {
     	 Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
     	 String username=null;
@@ -55,6 +56,7 @@ public class AppointmentController {
     }
      
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<AppointmentDTO> updateAppointment(@PathVariable Long id, @RequestBody AppointmentDTO appointmentDTO) {
         AppointmentDTO updatedAppointment = appointmentService.updateAppointment(id, appointmentDTO);
         return ResponseEntity.ok(updatedAppointment);

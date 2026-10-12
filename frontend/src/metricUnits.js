@@ -1,0 +1,18 @@
+export const metricUnits = {
+  systolicPressure: ["mmHg"],
+  diastolicPressure: ["mmHg"],
+  heartRate: ["bpm"],
+  temperature: ["°C", "°F"],
+  respiratoryRate: ["breaths/min"],
+  bloodOxygenLevel: ["%"],
+  bloodGlucoseLevel: ["mg/dL", "mmol/L"],
+  totalCholesterol: ["mg/dL", "mmol/L"],
+  hdlCholesterol: ["mg/dL", "mmol/L"],
+  ldlCholesterol: ["mg/dL", "mmol/L"],
+  triglycerides: ["mg/dL", "mmol/L"],
+  weight: ["kg", "lb"],
+  height: ["cm", "in"],
+  waistCircumference: ["cm", "in"],
+  bmi: ["kg/m²"],
+  physicalActivityLevel: ["minutes/week"],
+};
