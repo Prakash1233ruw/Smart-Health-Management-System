@@ -15,6 +15,43 @@ import io.jsonwebtoken.security.SignatureException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String,Object>> handleLargeUpload(Exception ex) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(Map.of("message","Report exceeds the 8 MB upload limit.","details","Payload too large"));
+    }
+
+    @ExceptionHandler(TimelineStorageException.class)
+    public ResponseEntity<Map<String, Object>> handleTimelineStorage(TimelineStorageException ex) {
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(Map.of(
+                "timestamp", LocalDateTime.now(), "message", ex.getMessage(), "details", "Service Unavailable"));
+    }
+
+    @ExceptionHandler({ReviewConflictException.class, org.springframework.dao.OptimisticLockingFailureException.class})
+    public ResponseEntity<Map<String, Object>> handleReviewConflict(Exception ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "timestamp", LocalDateTime.now(), "message", "Review conflict. Refresh the analysis before reviewing.", "details", "Conflict"));
+    }
+
+    @ExceptionHandler(org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidParameter(Exception ex) {
+        return ResponseEntity.badRequest().body(Map.of("timestamp", LocalDateTime.now(),
+                "message", "Invalid path or query parameter.", "details", "Bad request"));
+    }
+
+    @ExceptionHandler(AIServiceException.class)
+    public ResponseEntity<Map<String, Object>> handleAIServiceException(AIServiceException ex) {
+        return ResponseEntity.status(ex.getStatus()).body(Map.of(
+                "timestamp", LocalDateTime.now(), "message", ex.getMessage(),
+                "details", ex.getStatus().getReasonPhrase()));
+    }
+
+    @ExceptionHandler({org.springframework.web.bind.MethodArgumentNotValidException.class,
+            org.springframework.http.converter.HttpMessageNotReadableException.class})
+    public ResponseEntity<Map<String, Object>> handleInvalidRequest(Exception ex) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "timestamp", LocalDateTime.now(), "message", "Invalid request body or field values.",
+                "details", "Bad request"));
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(ResourceNotFoundException ex) {
@@ -32,6 +69,11 @@ public class GlobalExceptionHandler {
         errorDetails.put("message", ex.getMessage());
         errorDetails.put("details", "Bad request");
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleMissingEndpoint(Exception ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "Endpoint not available.", "details", "Resource not found"));
     }
 
     @ExceptionHandler(Exception.class)

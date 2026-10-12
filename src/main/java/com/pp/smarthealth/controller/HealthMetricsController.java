@@ -35,6 +35,14 @@ public class HealthMetricsController {
         return ResponseEntity.ok(healthMetricsList);
     }
 
+    public record MissingUnitsRequest(java.util.Map<String, String> units, boolean verifiedAgainstSource) {}
+
+    @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
+    @PatchMapping("/{id}/units")
+    public ResponseEntity<HealthMetricsDTO> addMissingUnits(@PathVariable Long id, @RequestBody MissingUnitsRequest body) {
+        return ResponseEntity.ok(healthMetricsService.addMissingUnits(id, body.units(), body.verifiedAgainstSource()));
+    }
+
     @PreAuthorize("hasRole('DOCTOR') or hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<HealthMetricsDTO> getHealthMetricsById(@PathVariable Long id) {

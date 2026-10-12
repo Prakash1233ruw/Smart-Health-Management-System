@@ -12,6 +12,8 @@ public interface HealthMetricsService {
 
     HealthMetricsDTO getHealthMetricsById(Long id);
 
+    HealthMetricsDTO addMissingUnits(Long id, java.util.Map<String, String> units, boolean verified);
+
     List<HealthMetricsDTO> getHealthMetricsByPatientId(Long patientId);
     
     boolean isAccessAllowed(Long patientId, String username);

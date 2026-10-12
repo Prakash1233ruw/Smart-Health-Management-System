@@ -14,6 +14,10 @@ import com.pp.smarthealth.model.Patient;
 
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
+    List<Appointment> findByDoctorIdOrderByDateTimeDesc(Long doctorId);
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select a from Appointment a where a.id = :id")
+    java.util.Optional<Appointment> findForVisitUpdate(@Param("id") Long id);
     List<Appointment> findByDoctorIdAndDateTimeAfterOrderByDateTimeAsc(Long doctorId, LocalDateTime dateTime);
 
 	 @Query("SELECT a FROM Appointment a WHERE a.dateTime BETWEEN :start AND :end")

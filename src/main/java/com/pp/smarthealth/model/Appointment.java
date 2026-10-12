@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.FutureOrPresent;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +19,6 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @FutureOrPresent
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 
@@ -35,4 +33,15 @@ public class Appointment {
     
     @Column(name = "notes", length = 500)
     private String notes;
+
+    @Column(length = 1000)
+    private String questions;
+    @Lob @Column(columnDefinition = "MEDIUMTEXT")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private String briefJson;
+    @Lob @Column(columnDefinition = "TEXT")
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private String approvedSummaryJson;
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private LocalDateTime summaryApprovedAt;
 }

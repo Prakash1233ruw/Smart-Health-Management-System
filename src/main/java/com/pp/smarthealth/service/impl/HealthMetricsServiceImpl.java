@@ -30,6 +30,7 @@ public class HealthMetricsServiceImpl implements HealthMetricsService {
         Patient patient = patientRepository.findById(healthMetricsDTO.getPatientId())
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
+        healthMetricsDTO.setUnits(com.pp.smarthealth.service.MetricCatalog.validate(healthMetricsDTO.getUnits(), healthMetricsDTO));
         HealthMetrics healthMetrics = convertToEntity(healthMetricsDTO, patient);
         HealthMetrics savedHealthMetrics = healthMetricsRepository.save(healthMetrics);
         return convertToDTO(savedHealthMetrics);
@@ -41,6 +42,24 @@ public class HealthMetricsServiceImpl implements HealthMetricsService {
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @org.springframework.transaction.annotation.Transactional
+    public HealthMetricsDTO addMissingUnits(Long id, java.util.Map<String, String> units, boolean verified) {
+        if (!verified || units == null || units.isEmpty())
+            throw new com.pp.smarthealth.exception.BadRequestException("Verify the source and select at least one missing unit.");
+        HealthMetrics record = healthMetricsRepository.findForUnitUpdate(id)
+                .orElseThrow(() -> new com.pp.smarthealth.exception.ResourceNotFoundException("Measurement record not found"));
+        var additions = com.pp.smarthealth.service.MetricCatalog.validate(units, convertToDTO(record));
+        var merged = new java.util.LinkedHashMap<String, String>(record.getUnits() == null ? java.util.Map.of() : record.getUnits());
+        additions.forEach((key, unit) -> {
+            if (merged.containsKey(key) && !merged.get(key).equals(unit))
+                throw new com.pp.smarthealth.exception.BadRequestException("An existing recorded unit cannot be replaced here.");
+            merged.put(key, unit);
+        });
+        record.setUnits(merged);
+        return convertToDTO(healthMetricsRepository.save(record));
     }
 
     @Override
@@ -82,7 +101,8 @@ public class HealthMetricsServiceImpl implements HealthMetricsService {
                 healthMetrics.getWaistCircumference(),
                 healthMetrics.getPhysicalActivityLevel(),
                 healthMetrics.getPatient().getId(),
-                healthMetrics.getPatient().getName() 
+                healthMetrics.getPatient().getName(),
+                healthMetrics.getUnits()
                
         );
     }
@@ -108,7 +128,8 @@ public class HealthMetricsServiceImpl implements HealthMetricsService {
                 healthMetricsDTO.getHeight(),
                 healthMetricsDTO.getWaistCircumference(),
                 healthMetricsDTO.getPhysicalActivityLevel(),
-                patient // Mapping the Patient object
+                patient, // Mapping the Patient object
+                healthMetricsDTO.getUnits()
         );
     }
 

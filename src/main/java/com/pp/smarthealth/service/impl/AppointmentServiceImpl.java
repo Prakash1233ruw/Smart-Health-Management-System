@@ -24,6 +24,7 @@ import jakarta.mail.MessagingException;
 
 @Service
 public class AppointmentServiceImpl implements AppointmentService {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppointmentServiceImpl.class);
 
     @Autowired
     private AppointmentRepository appointmentRepository;
@@ -36,9 +37,15 @@ public class AppointmentServiceImpl implements AppointmentService {
     
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private com.pp.smarthealth.service.VisitService visits;
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public AppointmentDTO createAppointment(AppointmentDTO appointmentDTO) {
+        if (appointmentDTO.getDateTime()==null || !appointmentDTO.getDateTime().isAfter(LocalDateTime.now())) {
+            throw new com.pp.smarthealth.exception.BadRequestException("Choose a future appointment time.");
+        }
         Doctor doctor = doctorRepository.findById(appointmentDTO.getDoctorId())
                 .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
@@ -49,10 +56,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setDateTime(appointmentDTO.getDateTime());
         appointment.setDoctor(doctor);
         appointment.setPatient(patient);
-        appointment.setStatus(appointmentDTO.getStatus());
+        appointment.setStatus("Scheduled");
         appointment.setNotes(appointmentDTO.getNotes());
+        appointment.setQuestions(appointmentDTO.getQuestions());
 
         Appointment savedAppointment = appointmentRepository.save(appointment);
+        savedAppointment.setBriefJson(visits.initialBrief(savedAppointment));
+        appointmentRepository.save(savedAppointment);
 
         // Send email reminder
         Map<String, Object> templateModel = new HashMap<>();
@@ -61,8 +71,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         try {
             emailService.sendEmailWithTemplate(savedAppointment.getPatient().getEmail(), "Appointment Scheduled", "appointment-reminder", templateModel);
-        } catch (MessagingException e) {
-            e.printStackTrace();
+        } catch (MessagingException | org.springframework.mail.MailException e) {
+            // The booking is already saved; email failure must not invite duplicate booking retries.
+            log.warn("Appointment saved; confirmation email could not be sent (details omitted).");
         }
 
         return convertToDTO(savedAppointment);
@@ -87,9 +98,20 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public AppointmentDTO updateAppointment(Long id, AppointmentDTO appointmentDTO) {
-        Appointment appointment = appointmentRepository.findById(id)
+        Appointment appointment = appointmentRepository.findForVisitUpdate(id)
                 .orElseThrow(() -> new RuntimeException("Appointment not found"));
+
+        var auth=org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        visits.assignedDoctor(appointment,auth);
+        if (appointment.getSummaryApprovedAt()!=null) throw new com.pp.smarthealth.exception.BadRequestException("A completed visit cannot be changed.");
+        if ((appointmentDTO.getDoctorId()!=null && !appointmentDTO.getDoctorId().equals(appointment.getDoctor().getId()))
+                || (appointmentDTO.getPatientId()!=null && !appointmentDTO.getPatientId().equals(appointment.getPatient().getId()))) {
+            throw new com.pp.smarthealth.exception.BadRequestException("Appointment participants cannot be changed. Make a new booking.");
+        }
+        if (appointmentDTO.getDateTime()==null || !appointmentDTO.getDateTime().isAfter(LocalDateTime.now())) throw new com.pp.smarthealth.exception.BadRequestException("Choose a future appointment time.");
+        if (!"Scheduled".equals(appointmentDTO.getStatus()) && !"Canceled".equals(appointmentDTO.getStatus())) throw new com.pp.smarthealth.exception.BadRequestException("Complete visits through the approved summary workflow.");
 
         appointment.setDateTime(appointmentDTO.getDateTime());
         appointment.setStatus(appointmentDTO.getStatus());
@@ -128,6 +150,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentDTO.setPatientId(appointment.getPatient().getId());
         appointmentDTO.setStatus(appointment.getStatus());
         appointmentDTO.setNotes(appointment.getNotes());
+        appointmentDTO.setQuestions(appointment.getQuestions());
 
         return appointmentDTO;
     }
@@ -172,14 +195,16 @@ public class AppointmentServiceImpl implements AppointmentService {
 
 
 	@Override
+    @org.springframework.transaction.annotation.Transactional
 	public boolean cancelAppointment(Long appointmentId, Long patientId) {
-		 Optional<Appointment> appointmentOpt = appointmentRepository.findById(appointmentId);
+		 Optional<Appointment> appointmentOpt = appointmentRepository.findForVisitUpdate(appointmentId);
 
 	        if (appointmentOpt.isPresent()) {
 	            Appointment appointment = appointmentOpt.get();
 
 	            // Ensure the patient who booked the appointment is canceling it
-	            if (appointment.getPatient().getId().equals(patientId)) {
+	            if (appointment.getPatient().getId().equals(patientId) && appointment.getSummaryApprovedAt()==null
+                        && appointment.getDateTime().isAfter(LocalDateTime.now())) {
 	                appointment.setStatus("Canceled");
 	                appointmentRepository.save(appointment);
 	                return true;

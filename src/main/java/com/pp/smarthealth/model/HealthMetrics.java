@@ -31,12 +31,12 @@ public class HealthMetrics {
     private Double temperature;
     private Integer respiratoryRate;
     private Integer bloodOxygenLevel;
-    private Integer bloodGlucoseLevel;
+    private Double bloodGlucoseLevel;
     private Double bmi;
-    private Integer totalCholesterol;
-    private Integer hdlCholesterol;
-    private Integer ldlCholesterol;
-    private Integer triglycerides;
+    private Double totalCholesterol;
+    private Double hdlCholesterol;
+    private Double ldlCholesterol;
+    private Double triglycerides;
     private Double weight;
     private Double height;
     private Double waistCircumference;
@@ -45,4 +45,12 @@ public class HealthMetrics {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id", nullable = false)
     private Patient patient;
+    @Convert(converter = MetricUnitConverter.class)
+    @Column(name="units_json", length=4000)
+    private java.util.Map<String,String> units = new java.util.LinkedHashMap<>();
+    public void setBloodGlucoseLevel(Number value) { this.bloodGlucoseLevel = value == null ? null : value.doubleValue(); }
+    public void setTotalCholesterol(Number value) { this.totalCholesterol = value == null ? null : value.doubleValue(); }
+    public void setHdlCholesterol(Number value) { this.hdlCholesterol = value == null ? null : value.doubleValue(); }
+    public void setLdlCholesterol(Number value) { this.ldlCholesterol = value == null ? null : value.doubleValue(); }
+    public void setTriglycerides(Number value) { this.triglycerides = value == null ? null : value.doubleValue(); }
 }

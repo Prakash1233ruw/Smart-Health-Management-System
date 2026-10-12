@@ -1,0 +1,292 @@
+{
+  "info": {
+    "name": "Patient Health Timeline - Doctor Review",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Set actual patientId, patientToken and doctorToken (JWT only). Existing /auth/login supplies tokens. Replace measurement dates if newer data exists. Successful analyses capture analysisId; fallbacks have none. See HEALTH-TIMELINE.md. No real credentials included."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "patientId",
+      "value": "1"
+    },
+    {
+      "key": "patientToken",
+      "value": ""
+    },
+    {
+      "key": "doctorToken",
+      "value": ""
+    },
+    {
+      "key": "analysisId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Save previous measurements (doctor)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{doctorToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/healthmetrics",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"patientId\":{{patientId}},\"date\":\"2026-01-01\",\"timestamp\":\"2026-01-01T10:00:00\",\"heartRate\":60,\"weight\":80,\"systolicPressure\":120,\"diastolicPressure\":80}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "2. Save latest measurements (doctor)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{doctorToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/healthmetrics",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"patientId\":{{patientId}},\"date\":\"2026-01-02\",\"timestamp\":\"2026-01-02T10:00:00\",\"heartRate\":75,\"weight\":78,\"systolicPressure\":125,\"diastolicPressure\":78}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "3. Initial symptoms (patient)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{patientToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/ai/change-analysis/me",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"symptoms\":[\"cough\",\"fatigue\"]}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Request succeeds', () => pm.response.to.have.status(200));",
+              "const result = pm.response.json();",
+              "if (result.narrativeStatus === 'AVAILABLE' && result.analysisId) pm.collectionVariables.set('analysisId', result.analysisId);",
+              "else console.log('No saved analysis:', result.narrativeStatus);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Changed symptoms (patient)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{patientToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/ai/change-analysis/me",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"symptoms\":[\"cough\",\"fever\"]}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Request succeeds', () => pm.response.to.have.status(200));",
+              "const result = pm.response.json();",
+              "if (result.narrativeStatus === 'AVAILABLE' && result.analysisId) pm.collectionVariables.set('analysisId', result.analysisId);",
+              "else console.log('No saved analysis:', result.narrativeStatus);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Doctor adds follow-up and private notes",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{doctorToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/ai/analyses/{{analysisId}}/review",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"status\":\"FOLLOW_UP_REQUIRED\",\"internalNotes\":\"Private demonstration note.\",\"followUpRecommendation\":\"Arrange a clinic appointment to discuss the readings.\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "6. Patient views own timeline",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{patientToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/health-timeline/me?page=0&size=20"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Private notes absent', () => pm.expect(pm.response.text()).not.to.include('internalNotes'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Doctor views patient timeline",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{doctorToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/api/health-timeline/patients/{{patientId}}?page=0&size=20"
+      }
+    },
+    {
+      "name": "8. Doctor completes review",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{doctorToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/ai/analyses/{{analysisId}}/review",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"status\":\"REVIEWED\",\"internalNotes\":\"Reviewed after follow-up.\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "9. Metrics-only analysis (patient)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{patientToken}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/api/ai/change-analysis/me",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Request succeeds', () => pm.response.to.have.status(200));",
+              "const result = pm.response.json();",
+              "if (result.narrativeStatus === 'AVAILABLE' && result.analysisId) pm.collectionVariables.set('analysisId', result.analysisId);",
+              "else console.log('No saved analysis:', result.narrativeStatus);"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

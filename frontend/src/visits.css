@@ -1,0 +1,175 @@
+.visit-panel {
+  margin: 24px 0;
+  padding: clamp(18px, 3vw, 34px);
+  border: 1px solid var(--line, #d7e4e5);
+  border-radius: 22px;
+  background: var(--surface, #fff);
+  scroll-margin-top: 24px;
+}
+.visit-banner {
+  padding: 24px;
+  background: linear-gradient(115deg, #142f49, #245f67);
+  color: #fff;
+  border-radius: 18px;
+  margin: 20px 0;
+}
+.visit-banner h2,
+.visit-banner p,
+.visit-banner .eyebrow {
+  color: #fff;
+}
+.visit-banner small {
+  color: #d2eaee;
+}
+.visit-columns,
+.visit-trends {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin: 24px 0;
+}
+.visit-trends {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.visit-trends article {
+  padding: 18px;
+  border: 1px solid var(--line, #d7e4e5);
+  border-radius: 14px;
+}
+.visit-trends strong {
+  display: block;
+  font-size: 1.35rem;
+  overflow-wrap: normal;
+}
+.visit-trends strong small {
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.visit-step {
+  display: inline-flex;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: #36858c;
+  font-weight: 800;
+}
+.visit-verbatim {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+}
+.visit-values {
+  display: grid;
+  gap: 8px;
+}
+.visit-values div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #d7e4e5;
+  padding: 8px 0;
+}
+.visit-values dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 650;
+}
+.visit-brief details {
+  padding: 12px 0;
+}
+.visit-brief summary {
+  cursor: pointer;
+  line-height: 1.7;
+}
+.visit-gaps {
+  border-top: 1px solid #d7e4e5;
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+.visit-flag {
+  padding: 12px;
+  border-left: 3px solid #bf9752;
+  margin: 8px 0;
+}
+.visit-editor,
+.visit-approved {
+  border-top: 1px solid #d7e4e5;
+  margin-top: 28px;
+  padding-top: 28px;
+}
+.visit-editor label {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+}
+.visit-editor fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.visit-editor > small {
+  display: block;
+  margin-top: 12px;
+}
+.visit-editor .visit-approval,
+.visit-checklist label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  line-height: 1.6;
+}
+.visit-approval input,
+.visit-checklist input {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  margin-top: 3px;
+  accent-color: #28666c;
+}
+.visit-checklist {
+  display: grid;
+  gap: 14px;
+  margin: 20px 0;
+}
+.visit-followup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 26px 0;
+}
+.visit-home {
+  padding: clamp(24px, 5vw, 48px);
+  border-radius: 24px;
+  background: linear-gradient(120deg, #142f49, #28656b);
+  color: #fff;
+  margin-bottom: 24px;
+}
+.visit-home h2 {
+  color: #fff;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  max-width: 620px;
+  line-height: 1.25;
+}
+.visit-home p {
+  color: #d9eeed;
+  max-width: 660px;
+}
+.visit-home .primary {
+  background: #e3f4ed;
+  color: #163b41;
+}
+[data-weather-theme="night"] .visit-panel {
+  background: #152c3f;
+  color: #e3eeee;
+}
+@media (max-width: 720px) {
+  .visit-columns,
+  .visit-trends {
+    grid-template-columns: 1fr;
+  }
+  .visit-trends strong {
+    font-size: 1.5rem;
+  }
+}

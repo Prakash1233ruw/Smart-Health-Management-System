@@ -20,6 +20,8 @@ The Smart Health Management System is a REST API designed to streamline the mana
 
 ## Features
 
+- **Pre-Visit Summary**: Automatic appointment briefs with code-calculated changes and patient questions; doctor-approved post-visit summaries, action checklists and follow-up booking. Gemini can simplify doctor notes without publishing them. See [the workflow and REST API guide](docs/PRE-VISIT-SUMMARY.md). Standalone symptom/change analysis and AI report extraction are disabled by default; saved history remains available.
+
 - **Patient Management**: Manage patient records, including personal information and medical history.
 - **Appointment Scheduling**: Schedule, update, and view appointment history.
 - **Health Statistics**: Track and manage health statistics for patients.
@@ -46,7 +48,7 @@ The Smart Health Management System uses JWT (JSON Web Token) for securing API en
 
 ### How It Works
 
-1. **User Login**: The user sends a POST request with their credentials to the `/api/auth/signin` endpoint.
+1. **User Login**: The user sends a POST request with their credentials to the `/auth/login` endpoint.
 2. **Token Generation**: If the credentials are valid, the server generates a JWT and returns it in the response.
 3. **Token Usage**: The client includes the JWT in the `Authorization` header of subsequent requests to access protected resources.
 4. **Token Validation**: The server validates the token on each request to ensure the user is authenticated.
@@ -54,7 +56,7 @@ The Smart Health Management System uses JWT (JSON Web Token) for securing API en
 ### Example
 
 ```http
-POST /api/auth/login
+POST /auth/login
 Content-Type: application/json
 
 {
@@ -140,3 +142,42 @@ Response:
 ---
 
 Each endpoint is secured based on the user's role (Admin, Doctor, or Patient). Refer to the documentation for detailed role-based access control policies.
+
+
+## Patient Health Timeline and Doctor Review
+
+Java compares current symptoms and recorded measurements against prior patient history. Gemini summarizes the verified facts in structured JSON, and doctors review saved results, add private notes, and recommend patient-visible follow-ups. This is a demonstration of clinical decision support with doctor oversight.
+
+- Patients: `POST /api/ai/change-analysis/me` and `GET /api/health-timeline/me?page=0&size=20`.
+- Doctors: `POST /api/ai/change-analysis/patients/{patientId}`, `GET /api/health-timeline/patients/{patientId}`, and `PATCH /api/ai/analyses/{analysisId}/review`.
+- New successful analyses are saved as `PENDING_REVIEW`; doctors select `REVIEWED`, `FOLLOW_UP_REQUIRED`, or `DISMISSED`. Patient responses omit private notes.
+- Java owns numeric changes and the disclaimer. Gemini failures return verified changes with `narrativeStatus: UNAVAILABLE`, without saving a successful result.
+
+Before starting the upgraded app against an existing database, apply the [additive SQL migration](docs/db/V2__patient_health_timeline.sql) once as described in the [complete setup and API guide](docs/HEALTH-TIMELINE.md). Existing source data is preserved. Import the [timeline Postman collection](docs/Health-Timeline.postman_collection.json) for the full patient-to-doctor workflow.
+
+Keep `AI_API_KEY` and `AI_MODEL` in your run environment. New settings are `HEALTH_TIMELINE_ENABLED` (true), `HEALTH_TIMELINE_METRICS_HISTORY_LIMIT` (5, range 2–20), and `HEALTH_TIMELINE_MAX_PAGE_SIZE` (100, range 1–100). Original symptom history still follows `AI_SAVE_HISTORY`; new successful analyses always persist for review.
+
+Run `.\mvnw.cmd test -q` from the repository root. Tests use isolated H2 and mocked Gemini/email. Measurement units are not stored in the existing schema, and doctor access follows the existing role-wide policy. The guide explains calculation rules, response examples, security, limitations, and future improvements.
+
+> I built a patient health timeline that compares new symptoms and measurements with historical records. Java performs deterministic change calculations, while Gemini converts the verified changes into a structured clinical summary. Doctors remain in control by reviewing the result, adding private notes and recommending a follow-up. The feature is human-in-the-loop decision support, not an automated diagnosis.
+
+
+## React frontend
+
+Doctor-reviewed report import is available in **Overview → Upload health report**. Gemini extracts a PDF/photo into an editable draft; the doctor verifies the patient, collection date, values, and units before saving selected measurements together. See the [report-import setup and API guide](docs/REPORT-IMPORT.md). Measurement units are now stored, decimal lab results are supported, and mismatched units are excluded from comparisons. Restart Spring Boot for the schema/code update.
+
+The React 19 Pulse workspace is in [frontend](frontend/README.md). The frontend has been restored to the version from before October 4, 2026 at 7:47 AM IST. It includes patient and doctor workspaces, registration, appointment booking and cancellation, recorded health measurements, health timelines, AI symptom/change analysis, and doctor review. The newer CareFlow frontend is saved in `backups/careflow-before-rollback-20261004`.
+
+Start Spring Boot on port 8080, then run these commands in a second terminal:
+
+~~~powershell
+cd frontend
+npm.cmd install
+npm.cmd run dev
+~~~
+
+Open http://127.0.0.1:5173, select **Patient** or **Doctor**, and sign in with **Open my workspace**. Use **Create an account** to register. No Gemini key is needed in the browser.
+
+Restart Spring Boot after updating to load the new booking endpoints. Patients select **Appointments → Book appointment**, choose a registered doctor and a future date/time, and confirm. Doctors see their upcoming appointments. No additional database migration is needed for registration or booking; doctor availability and exclusive time slots are not enforced.
+
+Frontend checks: npm.cmd test, npm.cmd run build, and npm.cmd run test:browser (with the frontend dev server running and Google Chrome installed). The browser suite uses synthetic intercepted responses and does not call live AI or write to your database.

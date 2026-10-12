@@ -34,6 +34,9 @@ public class SecurityConfig {
         return http.csrf(customizer -> customizer.disable()).
                 authorizeHttpRequests(request -> request
                         .requestMatchers("auth/login", "/api/patients/register","/api/doctors/register","/api/admin/register").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/ai/**").hasAnyRole("PATIENT", "DOCTOR")
+                        .requestMatchers("/api/health-timeline/**").hasAnyRole("PATIENT", "DOCTOR")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/doctor/**").hasRole("DOCTOR")
                         .requestMatchers("/api/patient/**").hasRole("PATIENT")
